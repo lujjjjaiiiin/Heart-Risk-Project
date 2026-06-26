@@ -11,7 +11,6 @@ Original file is located at
 **1. Data loading**
 """
 
-import kagglehub
 
 # Download latest version
 path = kagglehub.dataset_download("mahatiratusher/heart-disease-risk-prediction-dataset")
