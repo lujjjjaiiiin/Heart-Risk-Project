@@ -187,9 +187,6 @@ plt.show()
 #9.**Stremlit**
 """
 
-!pip install streamlit
-
-!pip install pyngrok
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
