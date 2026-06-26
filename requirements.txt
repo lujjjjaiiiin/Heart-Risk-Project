@@ -1,3 +1,7 @@
 
 streamlit
 pands
+numpy
+scikit-learn
+matplotlib
+seaborn
