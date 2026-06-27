@@ -18,10 +18,6 @@ Original file is located at
 
 import pandas as pd
 
-df.head()
-df.shape
-df.info()
-df.describe()
 
 """#2. Exploratory Data Analysis (EDA)"""
 
