@@ -603,22 +603,30 @@ elif menu == "🧠 Predict":
     with tab3:
         col1, col2 = st.columns(2)
 
-        lifestyle_cols = [
-            "Sedentary_Lifestyle", "Chronic_Stress",
-            "Gender", "Age"
-        ]
+        # Lifestyle features without Gender
+lifestyle_cols = [
+    "Sedentary_Lifestyle",
+    "Chronic_Stress"
+]
 
-        for i, col in enumerate(lifestyle_cols):
-            with col1 if i % 2 == 0 else col2:
-                if col == "Age":
-                    inputs[col] = st.number_input(col, 0, 100, 30)
-                elif col == "Gender":  
-                   gender = st.radio("Gender", ["Male", "Female"])
-                   inputs["Gender"] = 0 if gender == "Male" else 1
-                else:
-                    inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+col1, col2 = st.columns(2)
+
+for i, col in enumerate(lifestyle_cols):
+    with col1 if i % 2 == 0 else col2:
+        inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+
+# =====================
+# AGE (special case)
+# =====================
+inputs["Age"] = st.number_input("Age", 0, 100, 30)
+
+# =====================
+# GENDER (separate UI)
+# =====================
+gender = st.radio("Gender", ["Male", "Female"])
+inputs["Gender"] = 0 if gender == "Male" else 1
       
-)
+
 
     # =========================
     # PREDICT BUTTON
