@@ -613,10 +613,8 @@ elif menu == "🧠 Predict":
                 if col == "Age":
                     inputs[col] = st.number_input(col, 0, 100, 30)
                 elif col == "Gender":  
-                    inputs["Gender"] = st.selectbox(
-                    "Gender",
-                     options=[0, 1],
-        format_func=lambda x: "Male" if x == 0 else "Female"
+                   gender = st.radio("Gender", ["Male", "Female"])
+                   inputs["Gender"] = 0 if gender == "Male" else 1
                 else:
                     inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
       
