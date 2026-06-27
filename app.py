@@ -78,15 +78,123 @@ menu = st.sidebar.radio(
 # =========================
 if menu == "🏠 Overview":
 
-    st.title("🫀 Heart Disease Risk AI Dashboard")
+    st.title("🫀 Heart Disease AI Dashboard")
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Records", len(df))
-    col2.metric("Features", df.shape[1]-1)
-    col3.metric("High Risk %", f"{df['Heart_Risk'].mean():.2%}")
+    st.markdown("""
+    <div style='color:#aaa; font-size:15px; margin-bottom:20px;'>
+    A machine learning system that analyzes patient health data and predicts heart disease risk with high accuracy.
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.dataframe(df.head())
+    st.markdown("---")
 
+    # =========================
+    # HERO CARDS (PRO KPI DESIGN)
+    # =========================
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.markdown(f"""
+    <div style='background:#1a1a1a; padding:15px; border-radius:12px; border:1px solid #333;'>
+    <h3 style='color:#ff4d4d;'>📊 Records</h3>
+    <h2>{len(df):,}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col2.markdown(f"""
+    <div style='background:#1a1a1a; padding:15px; border-radius:12px; border:1px solid #333;'>
+    <h3 style='color:#ff4d4d;'>🧬 Features</h3>
+    <h2>{df.shape[1]-1}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col3.markdown(f"""
+    <div style='background:#1a1a1a; padding:15px; border-radius:12px; border:1px solid #333;'>
+    <h3 style='color:#ff4d4d;'>⚠ High Risk</h3>
+    <h2>{int(df['Heart_Risk'].sum()):,}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col4.markdown(f"""
+    <div style='background:#1a1a1a; padding:15px; border-radius:12px; border:1px solid #333;'>
+    <h3 style='color:#ff4d4d;'>📈 Risk Rate</h3>
+    <h2>{df['Heart_Risk'].mean():.1%}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # =========================
+    # VISUAL SECTION (PRO LAYOUT)
+    # =========================
+    colA, colB = st.columns([1.3, 1])
+
+    # -------------------------
+    # LEFT: PIE CHART
+    # -------------------------
+    with colA:
+        st.subheader("Risk Distribution Overview")
+
+        fig, ax = plt.subplots(figsize=(5,4))
+
+        counts = df["Heart_Risk"].value_counts()
+
+        ax.pie(
+            counts,
+            labels=["Low Risk", "High Risk"],
+            autopct="%1.1f%%",
+            startangle=90,
+            colors=["#4d88ff", "#ff4d4d"],
+            wedgeprops={"edgecolor":"#111"}
+        )
+
+        fig.patch.set_facecolor("#0f0f0f")
+        ax.set_facecolor("#0f0f0f")
+
+        st.pyplot(fig)
+        plt.close()
+
+    # -------------------------
+    # RIGHT: QUICK INSIGHT BOX
+    # -------------------------
+    with colB:
+        st.subheader("Dataset Insights")
+
+        st.markdown("""
+        <div style='background:#1a1a1a; padding:20px; border-radius:12px; border:1px solid #333;'>
+
+        <h4 style='color:#ff4d4d;'>📌 Key Findings</h4>
+
+        <ul style='color:#ccc; line-height:1.8;'>
+        <li>Dataset contains balanced classification target</li>
+        <li>Binary medical indicators dominate features</li>
+        <li>Age & lifestyle are strong risk factors</li>
+        <li>Suitable for classification models (RF, LR)</li>
+        </ul>
+
+        <h4 style='color:#ff4d4d;'>🧠 ML Approach</h4>
+
+        <ul style='color:#ccc; line-height:1.8;'>
+        <li>StandardScaler for normalization</li>
+        <li>PCA for dimensionality reduction</li>
+        <li>Random Forest + Logistic Regression comparison</li>
+        </ul>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # =========================
+    # MINI HEATMAP (PRO TOUCH)
+    # =========================
+    st.subheader("Feature Correlation Snapshot")
+
+    fig, ax = plt.subplots(figsize=(10,5))
+    sns.heatmap(df.corr(), cmap="coolwarm", ax=ax, linewidths=0.3)
+    fig.patch.set_facecolor("#0f0f0f")
+
+    st.pyplot(fig)
+    plt.close()
 # =========================
 # EDA
 # =========================
