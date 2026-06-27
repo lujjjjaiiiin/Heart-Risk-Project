@@ -141,142 +141,93 @@ elif menu == "🤖 Models":
 # =========================
 elif menu == "🧠 Predict":
 
-    st.title("🫀 AI Heart Risk Assessment System")
+    st.title("🫀 Heart Disease Risk Assessment")
 
     st.markdown("""
-    <div style='color:#aaa; font-size:15px; margin-bottom:10px;'>
-    Advanced clinical decision support system powered by Machine Learning.
-    </div>
+    <p style='color:#aaa;'>
+    Please fill in the patient information below. The system will analyze the risk using AI.
+    </p>
     """, unsafe_allow_html=True)
 
-    st.markdown("---")
-
     # =========================
-    # STEP PROGRESS STYLE
+    # TABS (PRO STRUCTURE)
     # =========================
-    step = st.radio(
-        "Assessment Stage",
-        ["🧬 Symptoms Check", "🏥 Medical Profile", "🚶 Lifestyle Analysis"],
-        horizontal=True
-    )
+    tab1, tab2, tab3 = st.tabs(["🧬 Symptoms", "🏥 Medical History", "🧑 Lifestyle"])
 
     inputs = {}
 
     # =========================
-    # STAGE 1
+    # TAB 1: SYMPTOMS
     # =========================
-    if step == "🧬 Symptoms Check":
+    with tab1:
+        col1, col2 = st.columns(2)
 
-        st.subheader("Symptom Evaluation")
-
-        cols = st.columns(2)
-
-        symptoms = [
+        symptom_cols = [
             "Chest_Pain", "Shortness_of_Breath", "Fatigue",
             "Palpitations", "Dizziness", "Swelling",
             "Pain_Arms_Jaw_Back", "Cold_Sweats_Nausea"
         ]
 
-        for i, c in enumerate(symptoms):
-            with cols[i % 2]:
-                inputs[c] = st.slider(
-                    c,
-                    0.0, 1.0,
-                    0.0,
-                    help="0 = No symptom, 1 = Severe symptom"
-                )
-
-        st.info("Move to next stage to continue evaluation.")
+        for i, col in enumerate(symptom_cols):
+            with col1 if i % 2 == 0 else col2:
+                inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
 
     # =========================
-    # STAGE 2
+    # TAB 2: MEDICAL HISTORY
     # =========================
-    elif step == "🏥 Medical Profile":
+    with tab2:
+        col1, col2 = st.columns(2)
 
-        st.subheader("Medical History")
-
-        cols = st.columns(2)
-
-        medical = [
+        medical_cols = [
             "High_BP", "High_Cholesterol", "Diabetes",
             "Smoking", "Obesity", "Family_History"
         ]
 
-        for i, c in enumerate(medical):
-            with cols[i % 2]:
-                inputs[c] = st.slider(
-                    c,
-                    0.0, 1.0, 0.0,
-                    help="Medical condition presence"
-                )
-
-        st.warning("Ensure all medical conditions are correctly filled.")
+        for i, col in enumerate(medical_cols):
+            with col1 if i % 2 == 0 else col2:
+                inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
 
     # =========================
-    # STAGE 3
+    # TAB 3: LIFESTYLE
     # =========================
-    elif step == "🚶 Lifestyle Analysis":
-
-        st.subheader("Lifestyle & Demographics")
-
+    with tab3:
         col1, col2 = st.columns(2)
 
-        inputs["Sedentary_Lifestyle"] = col1.slider("Sedentary Lifestyle", 0.0, 1.0, 0.0)
-        inputs["Chronic_Stress"] = col2.slider("Chronic Stress", 0.0, 1.0, 0.0)
+        lifestyle_cols = [
+            "Sedentary_Lifestyle", "Chronic_Stress",
+            "Gender", "Age"
+        ]
 
-        inputs["Gender"] = col1.selectbox("Gender", [0, 1])
-        inputs["Age"] = col2.number_input("Age", 1, 100, 30)
+        for i, col in enumerate(lifestyle_cols):
+            with col1 if i % 2 == 0 else col2:
+                if col == "Age":
+                    inputs[col] = st.number_input(col, 0, 100, 30)
+                else:
+                    inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
 
     # =========================
-    # PREDICT BUTTON (GLOBAL)
+    # PREDICT BUTTON
     # =========================
-
     st.markdown("---")
 
-    col_btn, col_note = st.columns([1, 2])
+    if st.button("🔍 Predict Risk"):
 
-    with col_btn:
-        run = st.button("🔍 Run AI Analysis")
-
-    with col_note:
-        st.caption("AI will analyze all clinical + lifestyle + symptom data")
-
-    # =========================
-    # RESULT
-    # =========================
-    if run:
-
+        # convert to correct order
         input_df = pd.DataFrame([inputs])[X.columns]
 
-        scaled = scaler.transform(input_df)
-        pca_input = pca.transform(scaled)
+        input_scaled = scaler.transform(input_df)
+        input_pca = pca.transform(input_scaled)
 
-        pred = rf.predict(pca_input)[0]
-        prob = rf.predict_proba(pca_input)[0][1]
+        model_choice = rf  # default
+        prediction = model_choice.predict(input_pca)[0]
+        prob = model_choice.predict_proba(input_pca)[0][1]
 
         st.markdown("---")
-        st.subheader("AI Diagnosis Result")
+        st.subheader("Prediction Result")
 
-        if pred == 1:
-
-            st.error("⚠ HIGH RISK DETECTED")
-
-            st.markdown(f"""
-            **Risk Probability:** `{prob:.2%}`  
-            **Recommendation:** Immediate cardiology consultation is advised.
-            """)
-
-            st.markdown("🟥 System Confidence Indicator")
-            st.progress(float(prob))
-
+        if prediction == 1:
+            st.error(f"⚠ High Risk of Heart Disease ({prob:.2%})")
+            st.markdown("👉 Recommendation: Immediate medical consultation.")
         else:
-
-            st.success("✅ LOW RISK DETECTED")
-
-            st.markdown(f"""
-            **Risk Probability:** `{prob:.2%}`  
-            **Recommendation:** Maintain healthy lifestyle and regular checkups.
-            """)
-
-            st.markdown("🟩 System Confidence Indicator")
-            st.progress(float(prob))
+            st.success(f"✅ Low Risk ({prob:.2%})")
+            st.markdown("👉 Recommendation: Maintain healthy lifestyle.")
