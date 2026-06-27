@@ -17,7 +17,6 @@ Original file is located at
 
 
 import pandas as pd
-df = pd.read_csv(path + '/heart_disease_risk_dataset_earlymed.csv')
 
 df.head()
 df.shape
