@@ -14,10 +14,7 @@ Original file is located at
 
 # Download latest version
 
-print("Path to dataset files:", path)
 
-import os
-print(os.listdir(path))
 
 import pandas as pd
 df = pd.read_csv(path + '/heart_disease_risk_dataset_earlymed.csv')
