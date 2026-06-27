@@ -359,14 +359,7 @@ plt.show()
 #             st.success(f"✅ Low Risk of Heart Disease ({prob:.2%})")
 #             st.write("Maintain a healthy lifestyle.")
 
-import os
-print(path)
-print(os.listdir(path))
 
-from google.colab import files
-
-files.download("/kaggle/input/heart-disease-risk-prediction-dataset/heart_disease_risk_dataset_earlymed.csv")
-files.download("requirements.txt")
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile requirements.txt
