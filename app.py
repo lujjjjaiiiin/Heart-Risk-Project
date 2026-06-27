@@ -68,9 +68,7 @@ scaler, pca, rf, lr, X, X_test, y_test, y_pred_rf, y_pred_lr = train_models(df)
 # =========================
 # SIDEBAR
 # =========================
-# =========================
-# PREMIUM SIDEBAR NAVIGATION
-# =========================
+
 with st.sidebar:
 
     st.markdown("""
@@ -616,6 +614,11 @@ elif menu == "🧠 Predict":
                     inputs[col] = st.number_input(col, 0, 100, 30)
                 else:
                     inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+        inputs["Gender"] = st.selectbox(
+        "Gender",
+        options=[0, 1],
+        format_func=lambda x: "Male" if x == 0 else "Female"
+)
 
     # =========================
     # PREDICT BUTTON
