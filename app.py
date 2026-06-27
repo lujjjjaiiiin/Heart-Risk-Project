@@ -88,6 +88,11 @@ with st.sidebar:
     # =========================
     # NAVIGATION MENU (PREMIUM STYLE)
     # =========================
+    tab1, tab2, tab3 = st.tabs([
+    "🧬 Symptoms",
+    "🏥 Medical Profile",
+    "🚶 Lifestyle"
+])
     menu = st.radio(
         "📍 Navigation Menu",
         ["🏠 Overview", "📊 EDA", "🤖 Models", "🧠 Predict"],
