@@ -200,17 +200,140 @@ if menu == "🏠 Overview":
 # =========================
 elif menu == "📊 EDA":
 
-    st.title("Exploratory Data Analysis")
+    st.title("📊 Exploratory Data Analysis")
 
-    fig, ax = plt.subplots()
-    sns.countplot(x=df["Heart_Risk"], ax=ax)
-    st.pyplot(fig)
+    st.markdown("""
+    <div style='color:#aaa; font-size:15px; margin-bottom:10px;'>
+    Interactive analysis of patient health patterns and risk factors.
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.write("Correlation Heatmap")
+    st.markdown("---")
+
+    # =========================
+    # SIDEBAR FILTER STYLE INSIDE PAGE
+    # =========================
+    col1, col2 = st.columns([1, 2])
+
+    # =========================
+    # LEFT CONTROL PANEL
+    # =========================
+    with col1:
+        st.subheader("🎛 Controls")
+
+        feature = st.selectbox(
+            "Select Feature",
+            [c for c in df.columns if c != "Heart_Risk"]
+        )
+
+        chart_type = st.radio(
+            "Chart Type",
+            ["Distribution", "Boxplot", "Risk Comparison"]
+        )
+
+        st.markdown("---")
+
+        st.info("Use controls to explore patterns interactively")
+
+    # =========================
+    # RIGHT VISUAL AREA
+    # =========================
+    with col2:
+
+        # -------------------------
+        # 1. Distribution Plot
+        # -------------------------
+        if chart_type == "Distribution":
+
+            st.subheader(f"📈 Distribution of {feature}")
+
+            fig, ax = plt.subplots(figsize=(7,4))
+
+            sns.histplot(
+                df[feature],
+                bins=30,
+                kde=True,
+                color="#ff4d4d"
+            )
+
+            ax.set_facecolor("#0f0f0f")
+            fig.patch.set_facecolor("#0f0f0f")
+
+            st.pyplot(fig)
+            plt.close()
+
+        # -------------------------
+        # 2. Boxplot
+        # -------------------------
+        elif chart_type == "Boxplot":
+
+            st.subheader(f"📦 Boxplot of {feature} by Risk")
+
+            fig, ax = plt.subplots(figsize=(7,4))
+
+            sns.boxplot(
+                x="Heart_Risk",
+                y=feature,
+                data=df,
+                palette=["#4d88ff", "#ff4d4d"],
+                ax=ax
+            )
+
+            ax.set_xticklabels(["Low Risk", "High Risk"])
+
+            ax.set_facecolor("#0f0f0f")
+            fig.patch.set_facecolor("#0f0f0f")
+
+            st.pyplot(fig)
+            plt.close()
+
+        # -------------------------
+        # 3. Risk Comparison
+        # -------------------------
+        else:
+
+            st.subheader(f"⚠ Risk Comparison: {feature}")
+
+            fig, ax = plt.subplots(figsize=(7,4))
+
+            sns.barplot(
+                x="Heart_Risk",
+                y=feature,
+                data=df,
+                palette=["#4d88ff", "#ff4d4d"],
+                ax=ax
+            )
+
+            ax.set_xticklabels(["Low Risk", "High Risk"])
+
+            ax.set_facecolor("#0f0f0f")
+            fig.patch.set_facecolor("#0f0f0f")
+
+            st.pyplot(fig)
+            plt.close()
+
+    st.markdown("---")
+
+    # =========================
+    # CORRELATION (PREMIUM STYLE)
+    # =========================
+    st.subheader("🔥 Feature Correlation Matrix")
+
     fig, ax = plt.subplots(figsize=(10,6))
-    sns.heatmap(df.corr(), ax=ax, cmap="Reds")
-    st.pyplot(fig)
 
+    sns.heatmap(
+        df.corr(),
+        cmap="coolwarm",
+        linewidths=0.3,
+        ax=ax
+    )
+
+    ax.set_title("Correlation Between Features", color="white")
+
+    fig.patch.set_facecolor("#0f0f0f")
+
+    st.pyplot(fig)
+    plt.close()
 # =========================
 # MODELS
 # =========================
