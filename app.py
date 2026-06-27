@@ -13,7 +13,6 @@ Original file is located at
 
 
 # Download latest version
-path = kagglehub.dataset_download("mahatiratusher/heart-disease-risk-prediction-dataset")
 
 print("Path to dataset files:", path)
 
