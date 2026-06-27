@@ -339,24 +339,138 @@ elif menu == "📊 EDA":
 # =========================
 elif menu == "🤖 Models":
 
-    st.title("Model Evaluation")
+    st.title("🤖 Model Performance Dashboard")
 
+    st.markdown("""
+    <div style='color:#aaa; font-size:15px; margin-bottom:10px;'>
+    Comparison between machine learning models trained on heart disease dataset.
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # =========================
+    # ACCURACY CARDS
+    # =========================
     acc_rf = accuracy_score(y_test, y_pred_rf)
     acc_lr = accuracy_score(y_test, y_pred_lr)
 
     col1, col2 = st.columns(2)
-    col1.metric("Random Forest", f"{acc_rf:.2%}")
-    col2.metric("Logistic Regression", f"{acc_lr:.2%}")
 
-    st.subheader("Confusion Matrix - RF")
-    fig, ax = plt.subplots()
-    sns.heatmap(confusion_matrix(y_test, y_pred_rf), annot=True, fmt="d", ax=ax)
-    st.pyplot(fig)
+    col1.markdown(f"""
+    <div style='background:#1a1a1a; padding:20px; border-radius:12px; border:1px solid #333; text-align:center;'>
+        <h3 style='color:#ff4d4d;'>🌲 Random Forest</h3>
+        <h2>{acc_rf:.2%}</h2>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.subheader("Confusion Matrix - LR")
-    fig, ax = plt.subplots()
-    sns.heatmap(confusion_matrix(y_test, y_pred_lr), annot=True, fmt="d", ax=ax)
+    col2.markdown(f"""
+    <div style='background:#1a1a1a; padding:20px; border-radius:12px; border:1px solid #333; text-align:center;'>
+        <h3 style='color:#4d88ff;'>📈 Logistic Regression</h3>
+        <h2>{acc_lr:.2%}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # =========================
+    # MODEL COMPARISON BAR CHART
+    # =========================
+    st.subheader("📊 Model Comparison")
+
+    fig, ax = plt.subplots(figsize=(6,4))
+
+    models = ["Random Forest", "Logistic Regression"]
+    scores = [acc_rf, acc_lr]
+    colors = ["#ff4d4d", "#4d88ff"]
+
+    ax.bar(models, scores, color=colors)
+
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("Accuracy")
+
+    for i, v in enumerate(scores):
+        ax.text(i, v + 0.01, f"{v:.2%}", ha="center", color="white")
+
+    fig.patch.set_facecolor("#0f0f0f")
+    ax.set_facecolor("#0f0f0f")
+
     st.pyplot(fig)
+    plt.close()
+
+    st.markdown("---")
+
+    # =========================
+    # CONFUSION MATRIX SIDE BY SIDE
+    # =========================
+    st.subheader("📉 Confusion Matrices")
+
+    colA, colB = st.columns(2)
+
+    with colA:
+        st.markdown("**Random Forest**")
+
+        fig, ax = plt.subplots(figsize=(4,4))
+
+        sns.heatmap(
+            confusion_matrix(y_test, y_pred_rf),
+            annot=True,
+            fmt="d",
+            cmap="Reds",
+            ax=ax
+        )
+
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+
+        fig.patch.set_facecolor("#0f0f0f")
+
+        st.pyplot(fig)
+        plt.close()
+
+    with colB:
+        st.markdown("**Logistic Regression**")
+
+        fig, ax = plt.subplots(figsize=(4,4))
+
+        sns.heatmap(
+            confusion_matrix(y_test, y_pred_lr),
+            annot=True,
+            fmt="d",
+            cmap="Blues",
+            ax=ax
+        )
+
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+
+        fig.patch.set_facecolor("#0f0f0f")
+
+        st.pyplot(fig)
+        plt.close()
+
+    st.markdown("---")
+
+    # =========================
+    # CLASSIFICATION REPORT SUMMARY
+    # =========================
+    st.subheader("🧠 Model Insights")
+
+    better_model = "Random Forest" if acc_rf > acc_lr else "Logistic Regression"
+
+    st.success(f"🏆 Best Performing Model: {better_model}")
+
+    st.markdown("""
+    ### 📌 Key Observations:
+    - Random Forest handles non-linear relationships better
+    - Logistic Regression is more interpretable
+    - Both models perform strongly due to clean dataset structure
+    """)
+
+    st.info("""
+    💡 In medical datasets, recall is often more important than accuracy
+    because missing a high-risk patient is critical.
+    """)
 
     # FIXED PCA curve (no refit!)
     cumvar = np.cumsum(pca.explained_variance_ratio_)
