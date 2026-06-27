@@ -68,10 +68,77 @@ scaler, pca, rf, lr, X, X_test, y_test, y_pred_rf, y_pred_lr = train_models(df)
 # =========================
 # SIDEBAR
 # =========================
-menu = st.sidebar.radio(
-    "Navigation",
-    ["🏠 Overview", "📊 EDA", "🤖 Models", "🧠 Predict"]
-)
+# =========================
+# PREMIUM SIDEBAR NAVIGATION
+# =========================
+with st.sidebar:
+
+    st.markdown("""
+    <div style='text-align:center; padding:15px 0;'>
+        <div style='font-size:3rem;'>🫀</div>
+        <div style='font-size:1.2rem; font-weight:700; color:#fff;'>
+            Heart AI System
+        </div>
+        <div style='font-size:0.75rem; color:#888; margin-top:5px;'>
+            Medical ML Dashboard
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # =========================
+    # NAVIGATION MENU (PREMIUM STYLE)
+    # =========================
+    menu = st.radio(
+        "📍 Navigation Menu",
+        ["🏠 Overview", "📊 EDA", "🤖 Models", "🧠 Predict"],
+        label_visibility="collapsed"
+    )
+
+    st.markdown("---")
+
+    # =========================
+    # DATA INFO CARD
+    # =========================
+    st.markdown(f"""
+    <div style='background:#1a1a1a; padding:12px; border-radius:10px; border:1px solid #333;'>
+        <div style='color:#ff4d4d; font-weight:600;'>📊 Dataset Info</div>
+        <div style='color:#aaa; font-size:12px; margin-top:5px;'>
+            Records: {len(df):,}<br>
+            Features: {df.shape[1]-1}<br>
+            Target: Heart Risk
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # =========================
+    # MODEL INFO CARD
+    # =========================
+    st.markdown("""
+    <div style='background:#1a1a1a; padding:12px; border-radius:10px; border:1px solid #333;'>
+        <div style='color:#4d88ff; font-weight:600;'>🧠 AI Models</div>
+        <div style='color:#aaa; font-size:12px; margin-top:5px;'>
+            • Random Forest<br>
+            • Logistic Regression<br>
+            • PCA + Scaling
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # =========================
+    # FOOTER
+    # =========================
+    st.markdown("""
+    <div style='text-align:center; margin-top:20px; color:#555; font-size:11px;'>
+        Built for Tuwaiq Academy<br>
+        ML Project © 2026
+    </div>
+    """, unsafe_allow_html=True)
 
 # =========================
 # OVERVIEW
