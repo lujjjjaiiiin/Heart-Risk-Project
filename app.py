@@ -600,33 +600,39 @@ elif menu == "🧠 Predict":
     # =========================
     # TAB 3: LIFESTYLE
     # =========================
-    with tab3:
-        col1, col2 = st.columns(2)
+   # =========================
+# TAB 3: LIFESTYLE
+# =========================
+with tab3:
 
-        # Lifestyle features without Gender
-lifestyle_cols = [
-    "Sedentary_Lifestyle",
-    "Chronic_Stress"
-]
+    st.subheader("🚶 Lifestyle & Demographics")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-for i, col in enumerate(lifestyle_cols):
-    with col1 if i % 2 == 0 else col2:
-        inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+    # =====================
+    # Lifestyle features
+    # =====================
+    lifestyle_cols = [
+        "Sedentary_Lifestyle",
+        "Chronic_Stress"
+    ]
 
-# =====================
-# AGE (special case)
-# =====================
-inputs["Age"] = st.number_input("Age", 0, 100, 30)
+    for i, col in enumerate(lifestyle_cols):
+        with col1 if i % 2 == 0 else col2:
+            inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
 
-# =====================
-# GENDER (separate UI)
-# =====================
-gender = st.radio("Gender", ["Male", "Female"])
-inputs["Gender"] = 0 if gender == "Male" else 1
-      
+    st.markdown("---")
 
+    # =====================
+    # AGE (separate UI)
+    # =====================
+    inputs["Age"] = st.number_input("Age", 0, 100, 30)
+
+    # =====================
+    # GENDER (proper UI)
+    # =====================
+    gender = st.radio("Gender", ["Male", "Female"])
+    inputs["Gender"] = 0 if gender == "Male" else 1
 
     # =========================
     # PREDICT BUTTON
