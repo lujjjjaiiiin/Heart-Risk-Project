@@ -469,7 +469,8 @@ if st.button("🔍 Predict Risk"):
     st.subheader("Prediction Result")
 
     col_res, col_gauge = st.columns([1, 1.5])
-        with col_res:
+    
+    with col_res:
             if prediction == 1:
                 st.markdown(f"""
                 <div style='background:#1a0505; border:1px solid #8b0000; border-radius:12px; padding:20px; text-align:center;'>
