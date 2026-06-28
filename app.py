@@ -393,7 +393,7 @@ elif menu == "🤖 Models":
 # =========================
 # PREDICT
 # =========================
-elif menu == "🧠 Predict":
+lif menu == "🧠 Predict":
 
     st.title("🫀 Heart Disease Risk Assessment")
     st.markdown("""
@@ -443,35 +443,32 @@ elif menu == "🧠 Predict":
         inputs["Gender"] = 0 if gender == "Male" else 1
 
     st.markdown("---")
-# اختيار النموذج
-model_name = st.selectbox(
-    "Choose Model",
-    ["Random Forest", "Logistic Regression", "XGBoost"]
-)
 
-if model_name == "Random Forest":
-    model_choice = rf
-elif model_name == "Logistic Regression":
-    model_choice = lr
-else:
-    model_choice = xgb
+    # اختيار النموذج
+    model_name = st.selectbox(
+        "Choose Model",
+        ["Random Forest", "Logistic Regression"]
+    )
 
+    if model_name == "Random Forest":
+        model_choice = rf
+    else:
+        model_choice = lr
 
-if st.button("🔍 Predict Risk"):
+    if st.button("🔍 Predict Risk"):
 
-    input_df = pd.DataFrame([inputs])[X.columns]
+        input_df = pd.DataFrame([inputs])[X.columns]
+        input_scaled = scaler.transform(input_df)
+        input_pca = pca.transform(input_scaled)
 
-    input_scaled = scaler.transform(input_df)
-    input_pca = pca.transform(input_scaled)
+        prediction = model_choice.predict(input_pca)[0]
+        prob = model_choice.predict_proba(input_pca)[0][1]
 
-    prediction = model_choice.predict(input_pca)[0]
-    prob = model_choice.predict_proba(input_pca)[0][1]
+        st.markdown("---")
+        st.subheader("Prediction Result")
 
-    st.markdown("---")
-    st.subheader("Prediction Result")
+        col_res, col_gauge = st.columns([1, 1.5])
 
-    col_res, col_gauge = st.columns([1, 1.5])
-    
         with col_res:
             if prediction == 1:
                 st.markdown(f"""
@@ -507,3 +504,7 @@ if st.button("🔍 Predict Risk"):
             ax.set_facecolor("#0f0f0f")
             st.pyplot(fig)
             plt.close()
+
+
+
+
