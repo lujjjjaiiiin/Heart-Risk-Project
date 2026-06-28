@@ -444,10 +444,6 @@ elif menu == "🧠 Predict":
 
     if st.button("🔍 Predict Risk"):
         # Fill any missing features with mean
-        for col in X.columns:
-            if col not in inputs:
-                inputs[col] = float(X[col].mean())
-
         input_df = pd.DataFrame([inputs])[X.columns]
         input_scaled = scaler.transform(input_df)
         input_pca = pca.transform(input_scaled)
