@@ -393,7 +393,7 @@ elif menu == "🤖 Models":
 # =========================
 # PREDICT
 # =========================
-lif menu == "🧠 Predict":
+elif menu == "🧠 Predict":
 
     st.title("🫀 Heart Disease Risk Assessment")
     st.markdown("""
