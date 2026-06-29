@@ -12,7 +12,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from xgboost import XGBClassifier
 
-
 # =========================
 # PAGE CONFIG
 # =========================
@@ -60,9 +59,13 @@ def train_models(df):
     lr.fit(X_train, y_train)
     y_pred_lr = lr.predict(X_test)
 
-    return scaler, pca, rf, lr, X, X_test, y_test, y_pred_rf, y_pred_lr
+    xgb = XGBClassifier(random_state=42, eval_metric="logloss")
+    xgb.fit(X_train, y_train)
+    y_pred_xgb = xgb.predict(X_test)
 
-scaler, pca, rf, lr, X, X_test, y_test, y_pred_rf, y_pred_lr = train_models(df)
+    return scaler, pca, rf, lr, xgb, X, X_test, y_test, y_pred_rf, y_pred_lr, y_pred_xgb
+
+scaler, pca, rf, lr, xgb, X, X_test, y_test, y_pred_rf, y_pred_lr, y_pred_xgb = train_models(df)
 
 # =========================
 # SIDEBAR
@@ -105,6 +108,7 @@ with st.sidebar:
         <div style='color:#aaa; font-size:12px; margin-top:5px;'>
             • Random Forest<br>
             • Logistic Regression<br>
+            • XGBoost<br>
             • PCA + Scaling
         </div>
     </div>
@@ -199,7 +203,7 @@ if menu == "🏠 Overview":
             <ul style='color:#ccc; line-height:1.8;'>
                 <li>StandardScaler for normalization</li>
                 <li>PCA for dimensionality reduction</li>
-                <li>Random Forest + Logistic Regression comparison</li>
+                <li>Random Forest + Logistic Regression + XGBoost</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -300,8 +304,9 @@ elif menu == "🤖 Models":
 
     acc_rf = accuracy_score(y_test, y_pred_rf)
     acc_lr = accuracy_score(y_test, y_pred_lr)
+    acc_xgb = accuracy_score(y_test, y_pred_xgb)
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     col1.markdown(f"""
     <div style='background:#1a1a1a; padding:20px; border-radius:12px; border:1px solid #333; text-align:center;'>
@@ -317,13 +322,20 @@ elif menu == "🤖 Models":
     </div>
     """, unsafe_allow_html=True)
 
+    col3.markdown(f"""
+    <div style='background:#1a1a1a; padding:20px; border-radius:12px; border:1px solid #333; text-align:center;'>
+        <h3 style='color:#ffaa00;'>⚡ XGBoost</h3>
+        <h2>{acc_xgb:.2%}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("---")
 
     st.subheader("📊 Model Comparison")
-    fig, ax = plt.subplots(figsize=(6, 4))
-    models = ["Random Forest", "Logistic Regression"]
-    scores = [acc_rf, acc_lr]
-    colors = ["#ff4d4d", "#4d88ff"]
+    fig, ax = plt.subplots(figsize=(7, 4))
+    models = ["Random Forest", "Logistic Regression", "XGBoost"]
+    scores = [acc_rf, acc_lr, acc_xgb]
+    colors = ["#ff4d4d", "#4d88ff", "#ffaa00"]
     ax.bar(models, scores, color=colors)
     ax.set_ylim(0, 1)
     ax.set_ylabel("Accuracy")
@@ -337,7 +349,7 @@ elif menu == "🤖 Models":
     st.markdown("---")
 
     st.subheader("📉 Confusion Matrices")
-    colA, colB = st.columns(2)
+    colA, colB, colC = st.columns(3)
 
     with colA:
         st.markdown("**Random Forest**")
@@ -361,17 +373,35 @@ elif menu == "🤖 Models":
         st.pyplot(fig)
         plt.close()
 
+    with colC:
+        st.markdown("**XGBoost**")
+        fig, ax = plt.subplots(figsize=(4, 4))
+        sns.heatmap(confusion_matrix(y_test, y_pred_xgb),
+                    annot=True, fmt="d", cmap="YlOrBr", ax=ax)
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+        fig.patch.set_facecolor("#0f0f0f")
+        st.pyplot(fig)
+        plt.close()
+
     st.markdown("---")
 
     st.subheader("🧠 Model Insights")
-    better_model = "Random Forest" if acc_rf > acc_lr else "Logistic Regression"
+    best_acc = max(acc_rf, acc_lr, acc_xgb)
+    if best_acc == acc_rf:
+        better_model = "Random Forest"
+    elif best_acc == acc_xgb:
+        better_model = "XGBoost"
+    else:
+        better_model = "Logistic Regression"
     st.success(f"🏆 Best Performing Model: {better_model}")
 
     st.markdown("""
     ### 📌 Key Observations:
     - Random Forest handles non-linear relationships better
     - Logistic Regression is more interpretable
-    - Both models perform strongly due to clean dataset structure
+    - XGBoost often achieves highest accuracy with boosting
+    - All models perform strongly due to clean dataset structure
     """)
 
     st.info("💡 In medical datasets, recall is often more important than accuracy because missing a high-risk patient is critical.")
@@ -415,7 +445,7 @@ elif menu == "🧠 Predict":
         for i, col in enumerate(symptom_cols):
             if col in X.columns:
                 with col1 if i % 2 == 0 else col2:
-                    inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+                    inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
 
     with tab2:
         col1, col2 = st.columns(2)
@@ -426,7 +456,7 @@ elif menu == "🧠 Predict":
         for i, col in enumerate(medical_cols):
             if col in X.columns:
                 with col1 if i % 2 == 0 else col2:
-                    inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+                    inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
 
     with tab3:
         st.subheader("🚶 Lifestyle & Demographics")
@@ -435,7 +465,7 @@ elif menu == "🧠 Predict":
         for i, col in enumerate(lifestyle_cols):
             if col in X.columns:
                 with col1 if i % 2 == 0 else col2:
-                    inputs[col] = st.slider(col, 0.0, 1.0, 0.0)
+                    inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
 
         st.markdown("---")
         inputs["Age"] = st.number_input("Age", 0, 100, 30)
@@ -444,16 +474,17 @@ elif menu == "🧠 Predict":
 
     st.markdown("---")
 
-    # اختيار النموذج
     model_name = st.selectbox(
         "Choose Model",
-        ["Random Forest", "Logistic Regression"]
+        ["Random Forest", "Logistic Regression", "XGBoost"]
     )
 
     if model_name == "Random Forest":
         model_choice = rf
-    else:
+    elif model_name == "Logistic Regression":
         model_choice = lr
+    else:
+        model_choice = xgb
 
     if st.button("🔍 Predict Risk"):
 
@@ -504,7 +535,3 @@ elif menu == "🧠 Predict":
             ax.set_facecolor("#0f0f0f")
             st.pyplot(fig)
             plt.close()
-
-
-
-
