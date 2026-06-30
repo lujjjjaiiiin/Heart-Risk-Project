@@ -276,7 +276,7 @@ if menu == "🏠  Overview":
     st.markdown("---")
     st.subheader("Feature Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(11, 5))
-    corr = df.corr()df.round(2)
+    corr = df.corr().round(2)
     fig = go.Figure(data=go.Heatmap(
     z=corr.values,
     x=corr.columns,
