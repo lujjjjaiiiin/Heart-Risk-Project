@@ -323,27 +323,31 @@ elif menu == "📊  EDA":
             st.pyplot(fig)
             plt.close()
  
-        elif chart_type == "Boxplot":
-            st.subheader(f"Boxplot — {feature} by Risk")
-            fig, ax = plt.subplots(figsize=(7, 4))
-            bp = ax.boxplot(
-                [df[df["Heart_Risk"] == 0][feature], df[df["Heart_Risk"] == 1][feature]],
-                labels=["Low Risk", "High Risk"],
-                patch_artist=True,
-                medianprops={"color": "#fff", "linewidth": 2},
-                flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
-                whiskerprops={"color": "#555"},
-                capprops={"color": "#555"},
-            )
-            bp["boxes"][0].set_facecolor(BLUE + "55")
-            bp["boxes"][0].set_edgecolor(BLUE)
-            bp["boxes"][1].set_facecolor(RED + "55")
-            bp["boxes"][1].set_edgecolor(RED)
-            ax.grid(True)
-            fig.patch.set_facecolor(DARK_BG)
-            fig.tight_layout()
-            st.pyplot(fig)
-            plt.close()
+      elif chart_type == "Boxplot":
+    st.subheader(f"Boxplot — {feature} by Risk")
+    fig, ax = plt.subplots(figsize=(7, 4))
+
+    group0 = df[df["Heart_Risk"] == 0][feature].dropna().astype(float).values
+    group1 = df[df["Heart_Risk"] == 1][feature].dropna().astype(float).values
+
+    bp = ax.boxplot(
+        [group0, group1],
+        tick_labels=["Low Risk", "High Risk"],   # ← بدل labels
+        patch_artist=True,
+        medianprops={"color": "#fff", "linewidth": 2},
+        flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
+        whiskerprops={"color": "#555"},
+        capprops={"color": "#555"},
+    )
+    bp["boxes"][0].set_facecolor(BLUE + "55")
+    bp["boxes"][0].set_edgecolor(BLUE)
+    bp["boxes"][1].set_facecolor(RED + "55")
+    bp["boxes"][1].set_edgecolor(RED)
+    ax.grid(True)
+    fig.patch.set_facecolor(DARK_BG)
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close()
  
         else:
             st.subheader(f"Risk Comparison — {feature}")
