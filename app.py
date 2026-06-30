@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import streamlit as st
 import pandas as pd
@@ -96,8 +95,8 @@ hr { border-color: #1e1e1e; margin: 1.8rem 0; }
 # =========================
 # MATPLOTLIB THEME
 # =========================
-DARK_BG   = "#0e0e0e"
-CARD_BG   = "#131313"
+DARK_BG   = "none"
+CARD_BG   = "none"
 GRID_CLR  = "#1e1e1e"
 TEXT_CLR  = "#cccccc"
 RED       = "#ff4d4d"
@@ -108,21 +107,21 @@ GREEN     = "#4dff88"
 plt.rcParams.update({
     "figure.facecolor":  DARK_BG,
     "axes.facecolor":    CARD_BG,
-    "axes.edgecolor":    "#2a2a2a",
-    "axes.labelcolor":   TEXT_CLR,
+    "axes.edgecolor":    "#444444",
+    "axes.labelcolor":   "#ffffff",
     "axes.titlecolor":   "#ffffff",
-    "axes.titlesize":    13,
-    "axes.labelsize":    10,
-    "xtick.color":       "#777",
-    "ytick.color":       "#777",
-    "xtick.labelsize":   9,
-    "ytick.labelsize":   9,
+    "axes.titlesize":    14,
+    "axes.labelsize":    11,
+    "xtick.color":       "#aaaaaa",
+    "ytick.color":       "#aaaaaa",
+    "xtick.labelsize":   10,
+    "ytick.labelsize":   10,
     "text.color":        TEXT_CLR,
     "grid.color":        GRID_CLR,
     "grid.linestyle":    "--",
     "grid.alpha":        0.6,
-    "legend.facecolor":  "#1a1a1a",
-    "legend.edgecolor":  "#2a2a2a",
+    "legend.facecolor":  "none",
+    "legend.edgecolor":  "#555555",
     "legend.fontsize":   9,
     "lines.linewidth":   2.5,
 })
@@ -580,4 +579,3 @@ elif menu == "🧠  Predict":
             fig.tight_layout()
             st.pyplot(fig)
             plt.close()
- 
