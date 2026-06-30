@@ -4,6 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import plotly.graph_objects as go
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
@@ -11,7 +12,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from xgboost import XGBClassifier
-import plotly.graph_objects as go
 
 # =========================
 # PAGE CONFIG
@@ -275,37 +275,38 @@ if menu == "🏠  Overview":
 
     st.markdown("---")
     st.subheader("Feature Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(11, 5))
-    corr = df.corr().round(2)
-    fig = go.Figure(data=go.Heatmap(
-    z=corr.values,
-    x=corr.columns,
-    y=corr.columns,
-    colorscale="RdBu_r",
-    zmid=0,
-    text=corr.values,
-    texttemplate="%{text}",
-    textfont={"size": 9, "color": "white"},
-    hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
-    colorbar=dict(
-        title="Correlation",
-        titlefont=dict(color="#ccc"),
-        tickfont=dict(color="#ccc"),
-        thickness=15,
-    ),
-))
-    
-    fig.update_layout(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="#cccccc", family="Inter"),
-    xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
-    yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
-    height=550,
-    margin=dict(l=10, r=10, t=30, b=10),
-)
 
-st.plotly_chart(fig, use_container_width=True)
+    corr = df.corr().round(2)
+
+    fig = go.Figure(data=go.Heatmap(
+        z=corr.values,
+        x=corr.columns,
+        y=corr.columns,
+        colorscale="RdBu_r",
+        zmid=0,
+        text=corr.values,
+        texttemplate="%{text}",
+        textfont={"size": 9, "color": "white"},
+        hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
+        colorbar=dict(
+            title="Correlation",
+            titlefont=dict(color="#ccc"),
+            tickfont=dict(color="#ccc"),
+            thickness=15,
+        ),
+    ))
+
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#cccccc", family="Inter"),
+        xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
+        yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
+        height=550,
+        margin=dict(l=10, r=10, t=30, b=10),
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 # =========================
 # EDA
@@ -386,17 +387,39 @@ elif menu == "📊  EDA":
 
     st.markdown("---")
     st.subheader("Full Correlation Matrix")
-    fig, ax = plt.subplots(figsize=(11, 6))
-    sns.heatmap(df.corr(), cmap="RdYlBu_r", linewidths=0.5,
-                linecolor="#0a0a0a", ax=ax, annot=True, fmt=".1f",
-                annot_kws={"size": 7})
-    ax.tick_params(axis='x', rotation=45, labelsize=8)
-    ax.tick_params(axis='y', rotation=0, labelsize=8)
-    ax.set_title("Feature Correlation Matrix", pad=14)
-    fig.patch.set_facecolor(DARK_BG)
-    fig.tight_layout()
-    st.pyplot(fig)
-    plt.close()
+
+    corr_eda = df.corr().round(2)
+
+    fig = go.Figure(data=go.Heatmap(
+        z=corr_eda.values,
+        x=corr_eda.columns,
+        y=corr_eda.columns,
+        colorscale="RdBu_r",
+        zmid=0,
+        text=corr_eda.values,
+        texttemplate="%{text}",
+        textfont={"size": 9, "color": "white"},
+        hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
+        colorbar=dict(
+            title="Correlation",
+            titlefont=dict(color="#ccc"),
+            tickfont=dict(color="#ccc"),
+            thickness=15,
+        ),
+    ))
+
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#cccccc", family="Inter"),
+        title=dict(text="Feature Correlation Matrix", font=dict(color="#fff", size=14)),
+        xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
+        yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
+        height=600,
+        margin=dict(l=10, r=10, t=50, b=10),
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 # =========================
 # MODELS
