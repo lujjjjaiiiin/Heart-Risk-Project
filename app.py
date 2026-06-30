@@ -289,8 +289,7 @@ if menu == "🏠  Overview":
         textfont={"size": 9, "color": "white"},
         hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
         colorbar=dict(
-            title="Correlation",
-            titlefont=dict(color="#ccc"),
+            title=dict(text="Correlation", font=dict(color="#ccc")),
             tickfont=dict(color="#ccc"),
             thickness=15,
         ),
@@ -401,8 +400,7 @@ elif menu == "📊  EDA":
         textfont={"size": 9, "color": "white"},
         hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
         colorbar=dict(
-            title="Correlation",
-            titlefont=dict(color="#ccc"),
+            title=dict(text="Correlation", font=dict(color="#ccc")),
             tickfont=dict(color="#ccc"),
             thickness=15,
         ),
