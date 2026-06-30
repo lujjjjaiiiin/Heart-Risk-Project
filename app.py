@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,7 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from xgboost import XGBClassifier
- 
+
 # =========================
 # PAGE CONFIG
 # =========================
@@ -22,18 +21,18 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
- 
+
 # =========================
 # GLOBAL STYLE
 # =========================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
- 
+
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
- 
+
 .stApp { background-color: #0a0a0a; }
- 
+
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f0f0f 0%, #111 100%);
@@ -41,7 +40,7 @@ section[data-testid="stSidebar"] {
     width: 280px !important;
 }
 section[data-testid="stSidebar"] * { color: #e0e0e0 !important; }
- 
+
 /* bigger radio labels */
 section[data-testid="stSidebar"] .stRadio label {
     font-size: 1.05rem !important;
@@ -52,7 +51,7 @@ section[data-testid="stSidebar"] .stRadio label {
 section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p {
     font-size: 1.05rem !important;
 }
- 
+
 /* Metric cards */
 [data-testid="stMetric"] {
     background: #111;
@@ -62,7 +61,7 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
 }
 [data-testid="stMetricLabel"] { color: #666 !important; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
 [data-testid="stMetricValue"] { color: #ff4d4d !important; font-size: 2.1rem; font-weight: 800; }
- 
+
 /* Buttons */
 .stButton > button {
     background: linear-gradient(135deg, #c1121f, #8b0000);
@@ -76,12 +75,12 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
     transform: translateY(-2px);
     box-shadow: 0 6px 24px rgba(193,18,31,0.45);
 }
- 
+
 h1 { color: #ffffff !important; font-weight: 800 !important; letter-spacing: -0.03em !important; }
 h2 { color: #f0f0f0 !important; font-weight: 700 !important; }
 h3 { color: #e0e0e0 !important; font-weight: 600 !important; }
 hr { border-color: #1e1e1e; margin: 1.8rem 0; }
- 
+
 .stDataFrame { border-radius: 12px; overflow: hidden; }
 .stNumberInput input, .stSelectbox select {
     background-color: #141414; border: 1px solid #2a2a2a;
@@ -91,7 +90,7 @@ hr { border-color: #1e1e1e; margin: 1.8rem 0; }
 .stTabs [aria-selected="true"] { color: #ff4d4d !important; border-bottom-color: #ff4d4d !important; }
 </style>
 """, unsafe_allow_html=True)
- 
+
 # =========================
 # MATPLOTLIB THEME
 # =========================
@@ -103,7 +102,7 @@ RED       = "#ff4d4d"
 BLUE      = "#4d88ff"
 GOLD      = "#ffaa00"
 GREEN     = "#4dff88"
- 
+
 plt.rcParams.update({
     "figure.facecolor":  DARK_BG,
     "axes.facecolor":    CARD_BG,
@@ -125,7 +124,7 @@ plt.rcParams.update({
     "legend.fontsize":   9,
     "lines.linewidth":   2.5,
 })
- 
+
 # =========================
 # LOAD DATA
 # =========================
@@ -134,9 +133,9 @@ def load_data():
     df = pd.read_csv("heart_disease_risk_dataset_earlymed.csv")
     df = df.drop_duplicates()
     return df
- 
+
 df = load_data()
- 
+
 # =========================
 # TRAIN MODELS
 # =========================
@@ -144,33 +143,33 @@ df = load_data()
 def train_models(df):
     X = df.drop("Heart_Risk", axis=1)
     y = df["Heart_Risk"]
- 
+
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
- 
+
     pca = PCA(n_components=0.93)
     X_pca = pca.fit_transform(X_scaled)
- 
+
     X_train, X_test, y_train, y_test = train_test_split(
         X_pca, y, test_size=0.2, random_state=42, stratify=y
     )
- 
+
     rf = RandomForestClassifier(random_state=42)
     rf.fit(X_train, y_train)
     y_pred_rf = rf.predict(X_test)
- 
+
     lr = LogisticRegression(random_state=42)
     lr.fit(X_train, y_train)
     y_pred_lr = lr.predict(X_test)
- 
+
     xgb = XGBClassifier(random_state=42, eval_metric="logloss")
     xgb.fit(X_train, y_train)
     y_pred_xgb = xgb.predict(X_test)
- 
+
     return scaler, pca, rf, lr, xgb, X, X_test, y_test, y_pred_rf, y_pred_lr, y_pred_xgb
- 
+
 scaler, pca, rf, lr, xgb, X, X_test, y_test, y_pred_rf, y_pred_lr, y_pred_xgb = train_models(df)
- 
+
 # =========================
 # SIDEBAR
 # =========================
@@ -183,15 +182,15 @@ with st.sidebar:
     </div>
     <hr style='border-color:#1e1e1e; margin:0 0 20px;'>
     """, unsafe_allow_html=True)
- 
+
     menu = st.radio(
         "nav",
         ["🏠  Overview", "📊  EDA", "🤖  Models", "🧠  Predict"],
         label_visibility="collapsed"
     )
- 
+
     st.markdown("<hr style='border-color:#1e1e1e; margin:20px 0;'>", unsafe_allow_html=True)
- 
+
     st.markdown(f"""
     <div style='background:#111; padding:14px 16px; border-radius:12px; border:1px solid #1e1e1e; margin-bottom:12px;'>
         <div style='color:#ff4d4d; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>📊 Dataset</div>
@@ -208,31 +207,31 @@ with st.sidebar:
         </div>
     </div>
     """, unsafe_allow_html=True)
- 
+
     st.markdown("""
     <div style='text-align:center; margin-top:24px; color:#333; font-size:0.7rem; letter-spacing:0.05em;'>
         TUWAIQ ACADEMY · ML PROJECT © 2026
     </div>
     """, unsafe_allow_html=True)
- 
+
 # =========================
 # OVERVIEW
 # =========================
 if menu == "🏠  Overview":
- 
+
     st.title("🫀 Heart Disease AI Dashboard")
     st.markdown("<p style='color:#666; font-size:1rem; margin-bottom:2rem;'>A machine learning system that analyzes patient health data and predicts heart disease risk.</p>", unsafe_allow_html=True)
     st.markdown("---")
- 
+
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Records", f"{len(df):,}")
     col2.metric("Features", df.shape[1] - 1)
     col3.metric("High Risk Cases", f"{int(df['Heart_Risk'].sum()):,}")
     col4.metric("Risk Rate", f"{df['Heart_Risk'].mean():.1%}")
- 
+
     st.markdown("---")
     colA, colB = st.columns([1.3, 1])
- 
+
     with colA:
         st.subheader("Risk Distribution")
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -252,7 +251,7 @@ if menu == "🏠  Overview":
         fig.patch.set_facecolor(DARK_BG)
         st.pyplot(fig)
         plt.close()
- 
+
     with colB:
         st.subheader("Key Insights")
         st.markdown(f"""
@@ -272,7 +271,7 @@ if menu == "🏠  Overview":
             </ul>
         </div>
         """, unsafe_allow_html=True)
- 
+
     st.markdown("---")
     st.subheader("Feature Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(11, 5))
@@ -289,25 +288,25 @@ if menu == "🏠  Overview":
     fig.tight_layout()
     st.pyplot(fig)
     plt.close()
- 
+
 # =========================
 # EDA
 # =========================
 elif menu == "📊  EDA":
- 
+
     st.title("📊 Exploratory Data Analysis")
     st.markdown("<p style='color:#666; font-size:1rem;'>Interactive analysis of patient health patterns.</p>", unsafe_allow_html=True)
     st.markdown("---")
- 
+
     col1, col2 = st.columns([1, 2.2])
- 
+
     with col1:
         st.subheader("🎛 Controls")
         feature = st.selectbox("Select Feature", [c for c in df.columns if c != "Heart_Risk"])
         chart_type = st.radio("Chart Type", ["Distribution", "Boxplot", "Risk Comparison"])
         st.markdown("---")
         st.info("Explore patterns interactively using the controls above.")
- 
+
     with col2:
         if chart_type == "Distribution":
             st.subheader(f"Distribution — {feature}")
@@ -322,33 +321,33 @@ elif menu == "📊  EDA":
             fig.tight_layout()
             st.pyplot(fig)
             plt.close()
- 
-      elif chart_type == "Boxplot":
-    st.subheader(f"Boxplot — {feature} by Risk")
-    fig, ax = plt.subplots(figsize=(7, 4))
 
-    group0 = df[df["Heart_Risk"] == 0][feature].dropna().astype(float).values
-    group1 = df[df["Heart_Risk"] == 1][feature].dropna().astype(float).values
+        elif chart_type == "Boxplot":
+            st.subheader(f"Boxplot — {feature} by Risk")
+            fig, ax = plt.subplots(figsize=(7, 4))
 
-    bp = ax.boxplot(
-        [group0, group1],
-        tick_labels=["Low Risk", "High Risk"],   # ← بدل labels
-        patch_artist=True,
-        medianprops={"color": "#fff", "linewidth": 2},
-        flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
-        whiskerprops={"color": "#555"},
-        capprops={"color": "#555"},
-    )
-    bp["boxes"][0].set_facecolor(BLUE + "55")
-    bp["boxes"][0].set_edgecolor(BLUE)
-    bp["boxes"][1].set_facecolor(RED + "55")
-    bp["boxes"][1].set_edgecolor(RED)
-    ax.grid(True)
-    fig.patch.set_facecolor(DARK_BG)
-    fig.tight_layout()
-    st.pyplot(fig)
-    plt.close()
- 
+            group0 = df[df["Heart_Risk"] == 0][feature].dropna().astype(float).values
+            group1 = df[df["Heart_Risk"] == 1][feature].dropna().astype(float).values
+
+            bp = ax.boxplot(
+                [group0, group1],
+                tick_labels=["Low Risk", "High Risk"],
+                patch_artist=True,
+                medianprops={"color": "#fff", "linewidth": 2},
+                flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
+                whiskerprops={"color": "#555"},
+                capprops={"color": "#555"},
+            )
+            bp["boxes"][0].set_facecolor(BLUE + "55")
+            bp["boxes"][0].set_edgecolor(BLUE)
+            bp["boxes"][1].set_facecolor(RED + "55")
+            bp["boxes"][1].set_edgecolor(RED)
+            ax.grid(True)
+            fig.patch.set_facecolor(DARK_BG)
+            fig.tight_layout()
+            st.pyplot(fig)
+            plt.close()
+
         else:
             st.subheader(f"Risk Comparison — {feature}")
             fig, ax = plt.subplots(figsize=(7, 4))
@@ -366,7 +365,7 @@ elif menu == "📊  EDA":
             fig.tight_layout()
             st.pyplot(fig)
             plt.close()
- 
+
     st.markdown("---")
     st.subheader("Full Correlation Matrix")
     fig, ax = plt.subplots(figsize=(11, 6))
@@ -380,25 +379,25 @@ elif menu == "📊  EDA":
     fig.tight_layout()
     st.pyplot(fig)
     plt.close()
- 
+
 # =========================
 # MODELS
 # =========================
 elif menu == "🤖  Models":
- 
+
     st.title("🤖 Model Performance")
     st.markdown("<p style='color:#666; font-size:1rem;'>Comparing all three trained models.</p>", unsafe_allow_html=True)
     st.markdown("---")
- 
+
     acc_rf  = accuracy_score(y_test, y_pred_rf)
     acc_lr  = accuracy_score(y_test, y_pred_lr)
     acc_xgb = accuracy_score(y_test, y_pred_xgb)
- 
+
     col1, col2, col3 = st.columns(3)
     col1.metric("🌲 Random Forest",      f"{acc_rf:.2%}")
     col2.metric("📈 Logistic Regression", f"{acc_lr:.2%}")
     col3.metric("⚡ XGBoost",            f"{acc_xgb:.2%}")
- 
+
     st.markdown("---")
     st.subheader("Accuracy Comparison")
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -419,11 +418,11 @@ elif menu == "🤖  Models":
     fig.tight_layout()
     st.pyplot(fig)
     plt.close()
- 
+
     st.markdown("---")
     st.subheader("Confusion Matrices")
     colA, colB, colC = st.columns(3)
- 
+
     for col, title, y_pred, cmap in [
         (colA, "Random Forest",       y_pred_rf,  "Reds"),
         (colB, "Logistic Regression", y_pred_lr,  "Blues"),
@@ -444,14 +443,14 @@ elif menu == "🤖  Models":
             fig.tight_layout()
             st.pyplot(fig)
             plt.close()
- 
+
     st.markdown("---")
     best_acc = max(acc_rf, acc_lr, acc_xgb)
     best_name = ["Random Forest", "XGBoost", "Logistic Regression"][
         [acc_rf, acc_xgb, acc_lr].index(best_acc)
     ]
     st.success(f"🏆 Best Model: **{best_name}** — {best_acc:.2%} accuracy")
- 
+
     st.markdown("---")
     st.subheader("PCA Explained Variance")
     cumvar = np.cumsum(pca.explained_variance_ratio_)
@@ -469,19 +468,19 @@ elif menu == "🤖  Models":
     fig.tight_layout()
     st.pyplot(fig)
     plt.close()
- 
+
 # =========================
 # PREDICT
 # =========================
 elif menu == "🧠  Predict":
- 
+
     st.title("🧠 Heart Disease Risk Assessment")
     st.markdown("<p style='color:#666; font-size:1rem;'>Fill in patient details to get an AI-powered risk prediction.</p>", unsafe_allow_html=True)
     st.markdown("---")
- 
+
     tab1, tab2, tab3 = st.tabs(["🧬 Symptoms", "🏥 Medical History", "🧑 Lifestyle"])
     inputs = {}
- 
+
     with tab1:
         col1, col2 = st.columns(2)
         symptom_cols = [
@@ -492,7 +491,7 @@ elif menu == "🧠  Predict":
             if col in X.columns:
                 with col1 if i % 2 == 0 else col2:
                     inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
- 
+
     with tab2:
         col1, col2 = st.columns(2)
         medical_cols = [
@@ -503,7 +502,7 @@ elif menu == "🧠  Predict":
             if col in X.columns:
                 with col1 if i % 2 == 0 else col2:
                     inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
- 
+
     with tab3:
         st.subheader("🚶 Lifestyle & Demographics")
         col1, col2 = st.columns(2)
@@ -516,28 +515,28 @@ elif menu == "🧠  Predict":
         inputs["Age"] = st.number_input("Age", 0, 100, 30)
         gender = st.radio("Gender", ["Male", "Female"])
         inputs["Gender"] = 0 if gender == "Male" else 1
- 
+
     st.markdown("---")
- 
+
     model_name = st.selectbox(
         "Choose Prediction Model",
         ["Random Forest", "Logistic Regression", "XGBoost"]
     )
     model_choice = rf if model_name == "Random Forest" else (lr if model_name == "Logistic Regression" else xgb)
- 
+
     if st.button("🔍 Predict Risk"):
         input_df = pd.DataFrame([inputs])[X.columns]
         input_scaled = scaler.transform(input_df)
         input_pca = pca.transform(input_scaled)
- 
+
         prediction = model_choice.predict(input_pca)[0]
         prob = model_choice.predict_proba(input_pca)[0][1]
- 
+
         st.markdown("---")
         st.subheader("Prediction Result")
- 
+
         col_res, col_gauge = st.columns([1, 1.6])
- 
+
         with col_res:
             if prediction == 1:
                 st.markdown(f"""
@@ -565,7 +564,7 @@ elif menu == "🧠  Predict":
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
- 
+
         with col_gauge:
             bar_color = RED if prediction == 1 else GREEN
             fig, ax = plt.subplots(figsize=(5.5, 3))
