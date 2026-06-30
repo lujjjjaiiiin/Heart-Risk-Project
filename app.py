@@ -11,6 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from xgboost import XGBClassifier
+import plotly.graph_objects as go
 
 # =========================
 # PAGE CONFIG
@@ -275,19 +276,36 @@ if menu == "🏠  Overview":
     st.markdown("---")
     st.subheader("Feature Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(11, 5))
-    corr = df.corr()
-    mask = np.zeros_like(corr, dtype=bool)
-    np.fill_diagonal(mask, True)
-    sns.heatmap(corr, cmap="RdYlBu_r", ax=ax, linewidths=0.5,
-                linecolor="#0a0a0a", annot=True, fmt=".1f",
-                annot_kws={"size": 7, "color": "#fff"},
-                cbar_kws={"shrink": 0.8})
-    ax.tick_params(axis='x', rotation=45, labelsize=8)
-    ax.tick_params(axis='y', rotation=0, labelsize=8)
-    fig.patch.set_facecolor(DARK_BG)
-    fig.tight_layout()
-    st.pyplot(fig)
-    plt.close()
+    corr = df.corr()df.round(2)
+    fig = go.Figure(data=go.Heatmap(
+    z=corr.values,
+    x=corr.columns,
+    y=corr.columns,
+    colorscale="RdBu_r",
+    zmid=0,
+    text=corr.values,
+    texttemplate="%{text}",
+    textfont={"size": 9, "color": "white"},
+    hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
+    colorbar=dict(
+        title="Correlation",
+        titlefont=dict(color="#ccc"),
+        tickfont=dict(color="#ccc"),
+        thickness=15,
+    ),
+))
+    
+    fig.update_layout(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="#cccccc", family="Inter"),
+    xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
+    yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
+    height=550,
+    margin=dict(l=10, r=10, t=30, b=10),
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 # =========================
 # EDA
