@@ -41,11 +41,11 @@ html, body, [class*="css"] {
                 linear-gradient(160deg, #ffffff 0%, #e2edfd 45%, #dce9fb 100%);
 }
 
-/* ── Sidebar: bold red gradient, glowing & advanced ── */
+/* ── Sidebar: soft glowing pink gradient ── */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(165deg, #1a0308 0%, #6b0f24 30%, #e11d48 62%, #8f0f2e 85%, #200308 100%);
+    background: linear-gradient(165deg, #2a0a2e 0%, #831843 28%, #ec4899 60%, #db2777 85%, #2a0a2e 100%);
     border-right: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 6px 0 40px rgba(225,29,72,0.35);
+    box-shadow: 6px 0 40px rgba(236,72,153,0.35);
     width: 285px !important;
     position: relative;
 }
@@ -93,14 +93,14 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
     letter-spacing: 0.1em;
 }
 [data-testid="stMetricValue"] {
-    color: #e11d48 !important;
+    color: #db2777 !important;
     font-size: 2.1rem;
     font-weight: 800;
 }
 
 /* ── Buttons ── */
 .stButton > button {
-    background: linear-gradient(135deg, #e11d48, #9f1239);
+    background: linear-gradient(135deg, #ec4899, #be185d);
     color: white;
     border: none;
     border-radius: 10px;
@@ -110,17 +110,17 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
     letter-spacing: 0.03em;
     transition: all 0.2s ease;
     width: 100%;
-    box-shadow: 0 6px 20px rgba(225,29,72,0.25);
+    box-shadow: 0 6px 20px rgba(236,72,153,0.25);
 }
 .stButton > button:hover {
-    background: linear-gradient(135deg, #f43f5e, #be123c);
+    background: linear-gradient(135deg, #f472b6, #9d174d);
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(225,29,72,0.35);
+    box-shadow: 0 10px 30px rgba(236,72,153,0.35);
 }
 
 /* ── Typography ── */
 h1 {
-    background: linear-gradient(90deg, #e11d48, #2563eb);
+    background: linear-gradient(90deg, #ec4899, #2563eb);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -151,8 +151,8 @@ hr { border-color: rgba(37,99,235,0.18); margin: 1.8rem 0; }
     font-size: 0.95rem;
 }
 .stTabs [aria-selected="true"] {
-    color: #e11d48 !important;
-    border-bottom-color: #e11d48 !important;
+    color: #db2777 !important;
+    border-bottom-color: #db2777 !important;
 }
 
 /* ── Info / success boxes ── */
@@ -234,8 +234,8 @@ def section_header(text):
     st.markdown(f"""
     <div style='display:flex; align-items:center; gap:12px; margin:6px 0 16px;'>
         <div style='width:6px; height:26px; border-radius:4px;
-                    background:linear-gradient(180deg,#e11d48,#2563eb);
-                    box-shadow:0 0 12px rgba(225,29,72,0.35);'></div>
+                    background:linear-gradient(180deg,#ec4899,#2563eb);
+                    box-shadow:0 0 12px rgba(236,72,153,0.35);'></div>
         <div style='font-size:1.22rem; font-weight:800; color:#0f172a; letter-spacing:-0.01em;'>{text}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -426,7 +426,7 @@ if menu == "🏠 Overview":
         section_header("Key Insights")
         st.markdown(f"""
         <div style='background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); padding:22px; border-radius:16px; border:1px solid rgba(37,99,235,0.18); box-shadow:0 8px 24px rgba(37,99,235,0.08);'>
-            <div style='color:#e11d48; font-weight:700; margin-bottom:10px;'>📌 Findings</div>
+            <div style='color:#db2777; font-weight:700; margin-bottom:10px;'>📌 Findings</div>
             <ul style='color:#475569; line-height:2; margin:0; padding-left:18px;'>
                 <li>Balanced classification target</li>
                 <li>Binary medical indicators dominate</li>
@@ -701,16 +701,21 @@ elif menu == "🧠 Predict":
 
         with col_gauge:
             bar_color = RED if prediction == 1 else BLUE
-            fig, ax = plt.subplots(figsize=(6.2, 3.4))
-            ax.barh(["Risk Score"], [prob], color=bar_color, height=0.4, zorder=3)
-            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#e2e8f0", height=0.4, zorder=3)
+            fig, ax = plt.subplots(figsize=(6.2, 2.9))
+            ax.barh(["Risk Score"], [prob], color=bar_color, height=0.42, zorder=3)
+            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#e2e8f0", height=0.42, zorder=3)
             ax.set_xlim(0, 1)
-            ax.set_xlabel("Probability", fontsize=11, fontweight="bold")
+            ax.set_ylim(-0.65, 0.65)
+            ax.set_yticks([])
             ax.axvline(0.5, color="#334155", linewidth=1.8, linestyle="--", zorder=4)
-            ax.text(0.5, -0.62, "Threshold", ha="center", fontsize=10, color="#334155", fontweight="bold")
-            ax.text(prob / 2 if prob > 0.12 else prob + 0.08, 0, f"{prob:.0%}", ha="center", va="center",
-                    color="#fff" if prob > 0.12 else "#0f172a", fontsize=14, fontweight="bold", zorder=5)
-            ax.set_title(f"Model: {model_name} · Risk: {prob:.1%}", fontsize=13, fontweight="bold")
+            ax.text(0.5, 0.48, "50% Threshold", ha="center", va="bottom",
+                    fontsize=9.5, color="#334155", fontweight="bold")
+            label_x = prob / 2 if prob > 0.12 else prob + 0.08
+            label_color = "#fff" if prob > 0.12 else "#0f172a"
+            ax.text(label_x, 0, f"{prob:.0%}", ha="center", va="center",
+                    color=label_color, fontsize=15, fontweight="bold", zorder=5)
+            ax.set_xlabel("Probability", fontsize=11, fontweight="bold", labelpad=10)
+            ax.set_title(f"Model: {model_name}", fontsize=13, fontweight="bold", pad=14)
             ax.grid(False)
             fig.patch.set_facecolor(DARK_BG)
             fig.tight_layout()
