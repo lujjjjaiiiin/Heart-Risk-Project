@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -25,7 +24,7 @@ st.set_page_config(
 )
 
 # =========================
-# GLOBAL STYLE
+# GLOBAL STYLE — LIGHT BLUE / ADVANCED THEME
 # =========================
 st.markdown("""
 <style>
@@ -34,20 +33,23 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
+
+/* ── App background: light, layered blue ── */
 .stApp {
-    background-color: #0a0a0a;
+    background: radial-gradient(circle at 15% 0%, #f0f7ff 0%, transparent 45%),
+                radial-gradient(circle at 100% 20%, #e3edff 0%, transparent 50%),
+                linear-gradient(160deg, #eef6ff 0%, #e2edfd 45%, #dce9fb 100%);
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar: deep navy for contrast against light body ── */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f0f0f 0%, #111 100%);
-    border-right: 1px solid #1e1e1e;
-    width: 280px !important;
+    background: linear-gradient(180deg, #0a1024 0%, #0f172a 100%);
+    border-right: 1px solid rgba(96,165,250,0.15);
+    width: 285px !important;
 }
 section[data-testid="stSidebar"] * {
-    color: #e0e0e0 !important;
+    color: #e7edf7 !important;
 }
-/* bigger radio labels */
 section[data-testid="stSidebar"] .stRadio label {
     font-size: 1.05rem !important;
     font-weight: 500 !important;
@@ -58,28 +60,31 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
     font-size: 1.05rem !important;
 }
 
-/* Metric cards */
+/* ── Metric cards: glassmorphism ── */
 [data-testid="stMetric"] {
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 14px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(37,99,235,0.18);
+    border-radius: 16px;
     padding: 18px 22px;
+    box-shadow: 0 8px 28px rgba(37,99,235,0.08);
 }
 [data-testid="stMetricLabel"] {
-    color: #666 !important;
+    color: #64748b !important;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
 [data-testid="stMetricValue"] {
-    color: #ff4d4d !important;
+    color: #e11d48 !important;
     font-size: 2.1rem;
     font-weight: 800;
 }
 
-/* Buttons */
+/* ── Buttons ── */
 .stButton > button {
-    background: linear-gradient(135deg, #c1121f, #8b0000);
+    background: linear-gradient(135deg, #e11d48, #9f1239);
     color: white;
     border: none;
     border-radius: 10px;
@@ -89,69 +94,92 @@ section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p 
     letter-spacing: 0.03em;
     transition: all 0.2s ease;
     width: 100%;
+    box-shadow: 0 6px 20px rgba(225,29,72,0.25);
 }
 .stButton > button:hover {
-    background: linear-gradient(135deg, #e01b2a, #a01010);
+    background: linear-gradient(135deg, #f43f5e, #be123c);
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(193,18,31,0.45);
+    box-shadow: 0 10px 30px rgba(225,29,72,0.35);
 }
 
-h1 { color: #ffffff !important; font-weight: 800 !important; letter-spacing: -0.03em !important; }
-h2 { color: #f0f0f0 !important; font-weight: 700 !important; }
-h3 { color: #e0e0e0 !important; font-weight: 600 !important; }
-hr { border-color: #1e1e1e; margin: 1.8rem 0; }
+/* ── Typography ── */
+h1 {
+    background: linear-gradient(90deg, #e11d48, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+}
+h2 { color: #1e293b !important; font-weight: 700 !important; }
+h3 { color: #1e293b !important; font-weight: 600 !important; }
+p, span, label, .stMarkdown { color: #334155; }
+hr { border-color: rgba(37,99,235,0.18); margin: 1.8rem 0; }
 
-.stDataFrame { border-radius: 12px; overflow: hidden; }
+.stDataFrame {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.08);
+}
 
-.stNumberInput input, .stSelectbox select {
-    background-color: #141414;
-    border: 1px solid #2a2a2a;
-    color: #f0f0f0;
-    border-radius: 8px;
+.stNumberInput input, .stSelectbox select, .stSelectbox div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(37,99,235,0.25) !important;
+    color: #1e293b !important;
+    border-radius: 8px !important;
 }
 
 .stTabs [data-baseweb="tab"] {
-    color: #666;
+    color: #64748b;
     font-weight: 500;
     font-size: 0.95rem;
 }
 .stTabs [aria-selected="true"] {
-    color: #ff4d4d !important;
-    border-bottom-color: #ff4d4d !important;
+    color: #e11d48 !important;
+    border-bottom-color: #e11d48 !important;
+}
+
+/* ── Info / success boxes ── */
+div[data-testid="stAlert"] {
+    background: rgba(255,255,255,0.75) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(37,99,235,0.2) !important;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# MATPLOTLIB THEME
+# MATPLOTLIB THEME — LIGHT / RED-BLUE PALETTE
 # =========================
 DARK_BG = "none"
 CARD_BG = "none"
-GRID_CLR = "#1e1e1e"
-TEXT_CLR = "#cccccc"
-RED = "#ff4d4d"
-BLUE = "#4d88ff"
-GOLD = "#ffaa00"
-GREEN = "#4dff88"
+GRID_CLR = "#cbd5e1"
+TEXT_CLR = "#334155"
+RED = "#e11d48"
+RED_LIGHT = "#fb7185"
+BLUE = "#2563eb"
+BLUE_LIGHT = "#60a5fa"
+VIOLET = "#7c3aed"   # blend of red + blue, used only as a 3rd tone when needed
 
 plt.rcParams.update({
     "figure.facecolor": DARK_BG,
     "axes.facecolor": CARD_BG,
-    "axes.edgecolor": "#444444",
-    "axes.labelcolor": "#ffffff",
-    "axes.titlecolor": "#ffffff",
+    "axes.edgecolor": "#94a3b8",
+    "axes.labelcolor": "#1e293b",
+    "axes.titlecolor": "#1e293b",
     "axes.titlesize": 14,
     "axes.labelsize": 11,
-    "xtick.color": "#aaaaaa",
-    "ytick.color": "#aaaaaa",
+    "xtick.color": "#475569",
+    "ytick.color": "#475569",
     "xtick.labelsize": 10,
     "ytick.labelsize": 10,
     "text.color": TEXT_CLR,
     "grid.color": GRID_CLR,
     "grid.linestyle": "--",
-    "grid.alpha": 0.6,
+    "grid.alpha": 0.5,
     "legend.facecolor": "none",
-    "legend.edgecolor": "#555555",
+    "legend.edgecolor": "#94a3b8",
     "legend.fontsize": 9,
     "lines.linewidth": 2.5,
 })
@@ -209,9 +237,9 @@ with st.sidebar:
     <div style='text-align:center; padding:28px 0 20px;'>
         <div style='font-size:3.2rem; line-height:1;'>🫀</div>
         <div style='font-size:1.25rem; font-weight:800; color:#fff; margin-top:10px; letter-spacing:-0.02em;'>Heart AI System</div>
-        <div style='font-size:0.75rem; color:#555; margin-top:5px; letter-spacing:0.08em; text-transform:uppercase;'>Medical ML Dashboard</div>
+        <div style='font-size:0.75rem; color:#8ea0c2; margin-top:5px; letter-spacing:0.08em; text-transform:uppercase;'>Medical ML Dashboard</div>
     </div>
-    <hr style='border-color:#1e1e1e; margin:0 0 20px;'>
+    <hr style='border-color:rgba(96,165,250,0.15); margin:0 0 20px;'>
     """, unsafe_allow_html=True)
 
     menu = st.radio(
@@ -220,27 +248,27 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.markdown("<hr style='border-color:#1e1e1e; margin:20px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color:rgba(96,165,250,0.15); margin:20px 0;'>", unsafe_allow_html=True)
 
     st.markdown(f"""
-    <div style='background:#111; padding:14px 16px; border-radius:12px; border:1px solid #1e1e1e; margin-bottom:12px;'>
-        <div style='color:#ff4d4d; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>📊 Dataset</div>
-        <div style='color:#aaa; font-size:0.82rem; line-height:1.9;'>
+    <div style='background:rgba(255,255,255,0.04); padding:14px 16px; border-radius:12px; border:1px solid rgba(225,29,72,0.25); margin-bottom:12px;'>
+        <div style='color:#fb7185; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>📊 Dataset</div>
+        <div style='color:#c3cee3; font-size:0.82rem; line-height:1.9;'>
             Records &nbsp;<span style='color:#fff; font-weight:600; float:right;'>{len(df):,}</span><br>
             Features &nbsp;<span style='color:#fff; font-weight:600; float:right;'>{df.shape[1]-1}</span><br>
             Target &nbsp;<span style='color:#fff; font-weight:600; float:right;'>Heart Risk</span>
         </div>
     </div>
-    <div style='background:#111; padding:14px 16px; border-radius:12px; border:1px solid #1e1e1e;'>
-        <div style='color:#4d88ff; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>🧠 Models</div>
-        <div style='color:#aaa; font-size:0.82rem; line-height:2;'>
+    <div style='background:rgba(255,255,255,0.04); padding:14px 16px; border-radius:12px; border:1px solid rgba(37,99,235,0.3);'>
+        <div style='color:#60a5fa; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>🧠 Models</div>
+        <div style='color:#c3cee3; font-size:0.82rem; line-height:2;'>
             🌲 Random Forest<br>📈 Logistic Regression<br>⚡ XGBoost<br>🔬 PCA + Scaling
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='text-align:center; margin-top:24px; color:#333; font-size:0.7rem; letter-spacing:0.05em;'>
+    <div style='text-align:center; margin-top:24px; color:#3f4c6b; font-size:0.7rem; letter-spacing:0.05em;'>
         TUWAIQ ACADEMY · ML PROJECT © 2026
     </div>
     """, unsafe_allow_html=True)
@@ -250,7 +278,7 @@ with st.sidebar:
 # =========================
 if menu == "🏠 Overview":
     st.title("🫀 Heart Disease AI Dashboard")
-    st.markdown("<p style='color:#666; font-size:1rem; margin-bottom:2rem;'>A machine learning system that analyzes patient health data and predicts heart disease risk.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b; font-size:1rem; margin-bottom:2rem;'>A machine learning system that analyzes patient health data and predicts heart disease risk.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -269,7 +297,7 @@ if menu == "🏠 Overview":
         wedges, texts, autotexts = ax.pie(
             counts, labels=["Low Risk", "High Risk"], autopct="%1.1f%%",
             startangle=90, colors=[BLUE, RED],
-            wedgeprops={"edgecolor": "#0a0a0a", "linewidth": 3},
+            wedgeprops={"edgecolor": "#eef6ff", "linewidth": 3},
             textprops={"color": TEXT_CLR, "fontsize": 10}
         )
         for at in autotexts:
@@ -282,16 +310,16 @@ if menu == "🏠 Overview":
     with colB:
         st.subheader("Key Insights")
         st.markdown(f"""
-        <div style='background:#111; padding:22px; border-radius:14px; border:1px solid #1e1e1e;'>
-            <div style='color:#ff4d4d; font-weight:700; margin-bottom:10px;'>📌 Findings</div>
-            <ul style='color:#aaa; line-height:2; margin:0; padding-left:18px;'>
+        <div style='background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); padding:22px; border-radius:16px; border:1px solid rgba(37,99,235,0.18); box-shadow:0 8px 24px rgba(37,99,235,0.08);'>
+            <div style='color:#e11d48; font-weight:700; margin-bottom:10px;'>📌 Findings</div>
+            <ul style='color:#475569; line-height:2; margin:0; padding-left:18px;'>
                 <li>Balanced classification target</li>
                 <li>Binary medical indicators dominate</li>
                 <li>Age & lifestyle are key risk factors</li>
                 <li>Clean data — no missing values</li>
             </ul>
-            <div style='color:#4d88ff; font-weight:700; margin:14px 0 10px;'>🧠 ML Pipeline</div>
-            <ul style='color:#aaa; line-height:2; margin:0; padding-left:18px;'>
+            <div style='color:#2563eb; font-weight:700; margin:14px 0 10px;'>🧠 ML Pipeline</div>
+            <ul style='color:#475569; line-height:2; margin:0; padding-left:18px;'>
                 <li>StandardScaler normalization</li>
                 <li>PCA dimensionality reduction (93%)</li>
                 <li>3 models trained & compared</li>
@@ -314,15 +342,15 @@ if menu == "🏠 Overview":
         textfont={"size": 9, "color": "white"},
         hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
         colorbar=dict(
-            title=dict(text="Correlation", font=dict(color="#ccc")),
-            tickfont=dict(color="#ccc"),
+            title=dict(text="Correlation", font=dict(color="#334155")),
+            tickfont=dict(color="#334155"),
             thickness=15,
         ),
     ))
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#cccccc", family="Inter"),
+        font=dict(color="#334155", family="Inter"),
         xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
         yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
         height=550,
@@ -335,7 +363,7 @@ if menu == "🏠 Overview":
 # =========================
 elif menu == "📊 EDA":
     st.title("📊 Exploratory Data Analysis")
-    st.markdown("<p style='color:#666; font-size:1rem;'>Interactive analysis of patient health patterns.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b; font-size:1rem;'>Interactive analysis of patient health patterns.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1, 2.2])
@@ -371,10 +399,10 @@ elif menu == "📊 EDA":
                 [group0, group1],
                 tick_labels=["Low Risk", "High Risk"],
                 patch_artist=True,
-                medianprops={"color": "#fff", "linewidth": 2},
+                medianprops={"color": "#1e293b", "linewidth": 2},
                 flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
-                whiskerprops={"color": "#555"},
-                capprops={"color": "#555"},
+                whiskerprops={"color": "#94a3b8"},
+                capprops={"color": "#94a3b8"},
             )
             bp["boxes"][0].set_facecolor(BLUE + "55")
             bp["boxes"][0].set_edgecolor(BLUE)
@@ -391,10 +419,10 @@ elif menu == "📊 EDA":
             fig, ax = plt.subplots(figsize=(7, 4))
             means = df.groupby("Heart_Risk")[feature].mean()
             bars = ax.bar(["Low Risk", "High Risk"], means.values, color=[BLUE, RED],
-                           width=0.45, edgecolor="#0a0a0a", linewidth=1.5)
+                           width=0.45, edgecolor="#eef6ff", linewidth=1.5)
             for bar, val in zip(bars, means.values):
                 ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01 * means.max(),
-                        f"{val:.2f}", ha="center", color="#fff", fontsize=10, fontweight="bold")
+                        f"{val:.2f}", ha="center", color="#1e293b", fontsize=10, fontweight="bold")
             ax.set_ylabel(f"Mean {feature}")
             ax.grid(True, axis="y")
             fig.patch.set_facecolor(DARK_BG)
@@ -417,16 +445,16 @@ elif menu == "📊 EDA":
         textfont={"size": 9, "color": "white"},
         hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
         colorbar=dict(
-            title=dict(text="Correlation", font=dict(color="#ccc")),
-            tickfont=dict(color="#ccc"),
+            title=dict(text="Correlation", font=dict(color="#334155")),
+            tickfont=dict(color="#334155"),
             thickness=15,
         ),
     ))
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#cccccc", family="Inter"),
-        title=dict(text="Feature Correlation Matrix", font=dict(color="#fff", size=14)),
+        font=dict(color="#334155", family="Inter"),
+        title=dict(text="Feature Correlation Matrix", font=dict(color="#1e293b", size=14)),
         xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
         yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
         height=600,
@@ -439,7 +467,7 @@ elif menu == "📊 EDA":
 # =========================
 elif menu == "🤖 Models":
     st.title("🤖 Model Performance")
-    st.markdown("<p style='color:#666; font-size:1rem;'>Comparing all three trained models.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b; font-size:1rem;'>Comparing all three trained models.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     acc_rf = accuracy_score(y_test, y_pred_rf)
@@ -456,11 +484,11 @@ elif menu == "🤖 Models":
     fig, ax = plt.subplots(figsize=(7, 4))
     model_names = ["Random Forest", "Logistic\nRegression", "XGBoost"]
     scores = [acc_rf, acc_lr, acc_xgb]
-    colors = [RED, BLUE, GOLD]
-    bars = ax.bar(model_names, scores, color=colors, width=0.45, edgecolor="#0a0a0a", linewidth=1.5)
+    colors = [RED, BLUE, VIOLET]
+    bars = ax.bar(model_names, scores, color=colors, width=0.45, edgecolor="#eef6ff", linewidth=1.5)
     for bar, val in zip(bars, scores):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.004,
-                f"{val:.2%}", ha="center", color="#fff", fontsize=11, fontweight="bold")
+                f"{val:.2%}", ha="center", color="#1e293b", fontsize=11, fontweight="bold")
     ax.set_ylim(min(scores) - 0.05, 1.0)
     ax.set_ylabel("Accuracy")
     ax.grid(True, axis="y")
@@ -475,14 +503,14 @@ elif menu == "🤖 Models":
     for col, title, y_pred, cmap in [
         (colA, "Random Forest", y_pred_rf, "Reds"),
         (colB, "Logistic Regression", y_pred_lr, "Blues"),
-        (colC, "XGBoost", y_pred_xgb, "YlOrBr"),
+        (colC, "XGBoost", y_pred_xgb, "Purples"),
     ]:
         with col:
             st.markdown(f"**{title}**")
             cm = confusion_matrix(y_test, y_pred)
             fig, ax = plt.subplots(figsize=(3.8, 3.4))
             sns.heatmap(cm, annot=True, fmt="d", cmap=cmap, ax=ax,
-                        linewidths=1.5, linecolor="#0a0a0a",
+                        linewidths=1.5, linecolor="#eef6ff",
                         xticklabels=["Low", "High"], yticklabels=["Low", "High"],
                         annot_kws={"size": 14, "weight": "bold"})
             ax.set_xlabel("Predicted", fontsize=9)
@@ -504,9 +532,9 @@ elif menu == "🤖 Models":
     cumvar = np.cumsum(pca.explained_variance_ratio_)
     fig, ax = plt.subplots(figsize=(9, 4))
     ax.plot(range(1, len(cumvar)+1), cumvar, color=RED, linewidth=2.5,
-            marker="o", markersize=6, markerfacecolor="#fff", markeredgecolor=RED)
+            marker="o", markersize=6, markerfacecolor="#eef6ff", markeredgecolor=RED)
     ax.fill_between(range(1, len(cumvar)+1), cumvar, alpha=0.12, color=RED)
-    ax.axhline(0.93, linestyle="--", color=GOLD, linewidth=1.5, label="93% threshold")
+    ax.axhline(0.93, linestyle="--", color=BLUE, linewidth=1.5, label="93% threshold")
     ax.set_xlabel("Number of Components")
     ax.set_ylabel("Cumulative Explained Variance")
     ax.set_title("PCA Explained Variance Curve")
@@ -522,7 +550,7 @@ elif menu == "🤖 Models":
 # =========================
 elif menu == "🧠 Predict":
     st.title("🧠 Heart Disease Risk Assessment")
-    st.markdown("<p style='color:#666; font-size:1rem;'>Fill in patient details to get an AI-powered risk prediction.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b; font-size:1rem;'>Fill in patient details to get an AI-powered risk prediction.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     tab1, tab2, tab3 = st.tabs(["🧬 Symptoms", "🏥 Medical History", "🧑 Lifestyle"])
@@ -586,38 +614,38 @@ elif menu == "🧠 Predict":
         with col_res:
             if prediction == 1:
                 st.markdown(f"""
-                <div style='background:linear-gradient(135deg,#1a0505,#110303); border:1px solid #8b0000; border-radius:16px; padding:28px 20px; text-align:center;'>
-                    <div style='font-size:2.4rem; font-weight:800; color:#ff4d4d;'>⚠️ High Risk</div>
-                    <div style='color:#888; margin-top:8px; font-size:0.9rem;'>
-                        Probability: <span style='color:#ff4d4d; font-weight:700; font-size:1.1rem;'>{prob:.1%}</span>
+                <div style='background:linear-gradient(135deg,#fff1f2,#ffe4e6); border:1px solid #e11d48; border-radius:16px; padding:28px 20px; text-align:center; box-shadow:0 8px 24px rgba(225,29,72,0.12);'>
+                    <div style='font-size:2.4rem; font-weight:800; color:#e11d48;'>⚠️ High Risk</div>
+                    <div style='color:#7f1d3a; margin-top:8px; font-size:0.9rem;'>
+                        Probability: <span style='color:#e11d48; font-weight:700; font-size:1.1rem;'>{prob:.1%}</span>
                     </div>
-                    <div style='margin-top:16px; font-size:0.82rem; color:#999; line-height:1.6;'>
+                    <div style='margin-top:16px; font-size:0.82rem; color:#9f4a5f; line-height:1.6;'>
                         Immediate consultation with a cardiologist is strongly recommended.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                <div style='background:linear-gradient(135deg,#051205,#030a03); border:1px solid #1a6b1a; border-radius:16px; padding:28px 20px; text-align:center;'>
-                    <div style='font-size:2.4rem; font-weight:800; color:#4dff88;'>✅ Low Risk</div>
-                    <div style='color:#888; margin-top:8px; font-size:0.9rem;'>
-                        Probability: <span style='color:#4dff88; font-weight:700; font-size:1.1rem;'>{prob:.1%}</span>
+                <div style='background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1px solid #2563eb; border-radius:16px; padding:28px 20px; text-align:center; box-shadow:0 8px 24px rgba(37,99,235,0.12);'>
+                    <div style='font-size:2.4rem; font-weight:800; color:#2563eb;'>✅ Low Risk</div>
+                    <div style='color:#1e3a72; margin-top:8px; font-size:0.9rem;'>
+                        Probability: <span style='color:#2563eb; font-weight:700; font-size:1.1rem;'>{prob:.1%}</span>
                     </div>
-                    <div style='margin-top:16px; font-size:0.82rem; color:#999; line-height:1.6;'>
+                    <div style='margin-top:16px; font-size:0.82rem; color:#4a6fa8; line-height:1.6;'>
                         Maintain a healthy lifestyle and schedule routine checkups.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
         with col_gauge:
-            bar_color = RED if prediction == 1 else GREEN
+            bar_color = RED if prediction == 1 else BLUE
             fig, ax = plt.subplots(figsize=(5.5, 3))
             ax.barh(["Risk Score"], [prob], color=bar_color, height=0.35, zorder=3)
-            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#1e1e1e", height=0.35, zorder=3)
+            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#dbe9fb", height=0.35, zorder=3)
             ax.set_xlim(0, 1)
             ax.set_xlabel("Probability", fontsize=9)
-            ax.axvline(0.5, color="#444", linewidth=1.2, linestyle="--", zorder=4)
-            ax.text(0.5, -0.62, "Threshold", ha="center", fontsize=8, color="#555")
+            ax.axvline(0.5, color="#94a3b8", linewidth=1.2, linestyle="--", zorder=4)
+            ax.text(0.5, -0.62, "Threshold", ha="center", fontsize=8, color="#64748b")
             ax.text(prob / 2, 0, f"{prob:.0%}", ha="center", va="center",
                     color="#fff", fontsize=12, fontweight="bold", zorder=5)
             ax.set_title(f"Model: {model_name} · Risk: {prob:.1%}", fontsize=10)
