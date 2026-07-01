@@ -218,7 +218,7 @@ with st.sidebar:
 # =========================
 # OVERVIEW
 # =========================
-if menu == "🏠  Overview":
+if menu = "🏠  Overview":
 
     st.title("🫀 Heart Disease AI Dashboard")
     st.markdown("<p style='color:#666; font-size:1rem; margin-bottom:2rem;'>A machine learning system that analyzes patient health data and predicts heart disease risk.</p>", unsafe_allow_html=True)
