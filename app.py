@@ -390,7 +390,7 @@ with st.sidebar:
 # OVERVIEW
 # =========================
 if menu == "🏠 Overview":
-    st.title("🫀 Heart Disease AI Dashboard")
+    st.title("Heart Disease AI Dashboard")
     st.markdown("<p style='color:#64748b; font-size:1rem; margin-bottom:2rem;'>A machine learning system that analyzes patient health data and predicts heart disease risk.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -450,14 +450,14 @@ if menu == "🏠 Overview":
 # EDA
 # =========================
 elif menu == "📊 EDA":
-    st.title("📊 Exploratory Data Analysis")
+    st.title("Exploratory Data Analysis")
     st.markdown("<p style='color:#64748b; font-size:1rem;'>Interactive analysis of patient health patterns.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1, 2.2])
 
     with col1:
-        section_header("🎛 Controls")
+        section_header("Controls")
         feature = st.selectbox("Select Feature", [c for c in df.columns if c != "Heart_Risk"])
         chart_type = st.radio("Chart Type", ["Distribution", "Boxplot", "Risk Comparison"])
         st.markdown("---")
@@ -529,7 +529,7 @@ elif menu == "📊 EDA":
 # MODELS
 # =========================
 elif menu == "🤖 Models":
-    st.title("🤖 Model Performance")
+    st.title("Model Performance")
     st.markdown("<p style='color:#64748b; font-size:1rem;'>Comparing all three trained models.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -611,7 +611,7 @@ elif menu == "🤖 Models":
 # PREDICT
 # =========================
 elif menu == "🧠 Predict":
-    st.title("🧠 Heart Disease Risk Assessment")
+    st.title("Heart Disease Risk Assessment")
     st.markdown("<p style='color:#64748b; font-size:1rem;'>Fill in patient details to get an AI-powered risk prediction.</p>", unsafe_allow_html=True)
     st.markdown("---")
 
