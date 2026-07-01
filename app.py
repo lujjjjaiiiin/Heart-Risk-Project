@@ -186,7 +186,7 @@ with st.sidebar:
 
     menu = st.radio(
         "nav",
-        ["🏠  Overview", "📊  EDA", "🤖  Models", "🧠  Predict"],
+        ["Overview", "EDA", "Models", "Predict"],
         label_visibility="collapsed"
     )
 
