@@ -222,7 +222,80 @@ plt.rcParams.update({
     "legend.fontsize": 10,
     "legend.framealpha": 0.9,
     "lines.linewidth": 3.4,
+    "figure.dpi": 170,
+    "savefig.dpi": 170,
 })
+
+# =========================
+# SHARED UI HELPERS — keeps every chart the same "family" & crystal clear
+# =========================
+def section_header(text):
+    """Unified section title used above every single chart in the app."""
+    st.markdown(f"""
+    <div style='display:flex; align-items:center; gap:12px; margin:6px 0 16px;'>
+        <div style='width:6px; height:26px; border-radius:4px;
+                    background:linear-gradient(180deg,#e11d48,#2563eb);
+                    box-shadow:0 0 12px rgba(225,29,72,0.35);'></div>
+        <div style='font-size:1.22rem; font-weight:800; color:#0f172a; letter-spacing:-0.01em;'>{text}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Consistent figure sizes so every chart feels like the same family
+FIG_WIDE   = (8.6, 4.4)   # full-width bar / line charts
+FIG_SIDE   = (5.4, 4.4)   # narrower column charts (paired with a card)
+FIG_SQUARE = (4.3, 3.9)   # small multiples (confusion matrices)
+
+def render_corr_heatmap(corr_df, height=620):
+    """Polished, always-legible correlation heatmap: bold per-cell text
+    that auto-switches white/navy for contrast, clean gaps between cells,
+    and a soft red-blue diverging palette matched to the rest of the app."""
+    z = corr_df.values
+    labels = corr_df.columns.tolist()
+
+    custom_scale = [
+        [0.00, "#1e3a8a"],
+        [0.25, "#3b82f6"],
+        [0.50, "#f8fafc"],
+        [0.75, "#f87171"],
+        [1.00, "#991b1b"],
+    ]
+
+    fig = go.Figure(data=go.Heatmap(
+        z=z, x=labels, y=labels,
+        colorscale=custom_scale,
+        zmid=0, zmin=-1, zmax=1,
+        xgap=3, ygap=3,
+        hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z:.2f}<extra></extra>",
+        colorbar=dict(
+            title=dict(text="Correlation", font=dict(color="#0f172a", size=12, family="Inter")),
+            tickfont=dict(color="#0f172a", size=11, family="Inter"),
+            thickness=16,
+            outlinewidth=0,
+        ),
+    ))
+
+    annotations = []
+    for i, ylab in enumerate(labels):
+        for j, xlab in enumerate(labels):
+            val = z[i][j]
+            color = "#ffffff" if abs(val) > 0.55 else "#0f172a"
+            annotations.append(dict(
+                x=xlab, y=ylab, text=f"<b>{val:.2f}</b>",
+                showarrow=False,
+                font=dict(color=color, size=11, family="Inter"),
+            ))
+
+    fig.update_layout(
+        annotations=annotations,
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        font=dict(color="#0f172a", family="Inter"),
+        xaxis=dict(tickangle=-45, tickfont=dict(size=11, color="#1e293b"), showgrid=False, zeroline=False),
+        yaxis=dict(tickfont=dict(size=11, color="#1e293b"), showgrid=False, zeroline=False, autorange="reversed"),
+        height=height,
+        margin=dict(l=10, r=10, t=20, b=10),
+    )
+    return fig
 
 # =========================
 # LOAD DATA
@@ -331,24 +404,26 @@ if menu == "🏠 Overview":
     colA, colB = st.columns([1.3, 1])
 
     with colA:
-        st.subheader("Risk Distribution")
-        fig, ax = plt.subplots(figsize=(5, 4))
+        section_header("Risk Distribution")
+        fig, ax = plt.subplots(figsize=FIG_SIDE)
         counts = df["Heart_Risk"].value_counts()
         wedges, texts, autotexts = ax.pie(
             counts, labels=["Low Risk", "High Risk"], autopct="%1.1f%%",
             startangle=90, colors=[BLUE, RED],
             wedgeprops={"edgecolor": "#ffffff", "linewidth": 3},
-            textprops={"color": TEXT_CLR, "fontsize": 10}
+            textprops={"color": TEXT_CLR, "fontsize": 11, "fontweight": "bold"}
         )
         for at in autotexts:
             at.set_color("#fff")
             at.set_fontweight("bold")
+            at.set_fontsize(12)
         fig.patch.set_facecolor(DARK_BG)
+        fig.tight_layout()
         st.pyplot(fig)
         plt.close()
 
     with colB:
-        st.subheader("Key Insights")
+        section_header("Key Insights")
         st.markdown(f"""
         <div style='background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); padding:22px; border-radius:16px; border:1px solid rgba(37,99,235,0.18); box-shadow:0 8px 24px rgba(37,99,235,0.08);'>
             <div style='color:#e11d48; font-weight:700; margin-bottom:10px;'>📌 Findings</div>
@@ -368,35 +443,8 @@ if menu == "🏠 Overview":
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.subheader("Feature Correlation Heatmap")
-
-    corr = df.corr().round(2)
-    fig = go.Figure(data=go.Heatmap(
-        z=corr.values,
-        x=corr.columns,
-        y=corr.columns,
-        colorscale="RdBu_r",
-        zmid=0,
-        text=corr.values,
-        texttemplate="%{text}",
-        textfont={"size": 9, "color": "white"},
-        hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
-        colorbar=dict(
-            title=dict(text="Correlation", font=dict(color="#334155")),
-            tickfont=dict(color="#334155"),
-            thickness=15,
-        ),
-    ))
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#334155", family="Inter"),
-        xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
-        yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
-        height=550,
-        margin=dict(l=10, r=10, t=30, b=10),
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    section_header("Feature Correlation Heatmap")
+    st.plotly_chart(render_corr_heatmap(df.corr().round(2)), use_container_width=True)
 
 # =========================
 # EDA
@@ -409,7 +457,7 @@ elif menu == "📊 EDA":
     col1, col2 = st.columns([1, 2.2])
 
     with col1:
-        st.subheader("🎛 Controls")
+        section_header("🎛 Controls")
         feature = st.selectbox("Select Feature", [c for c in df.columns if c != "Heart_Risk"])
         chart_type = st.radio("Chart Type", ["Distribution", "Boxplot", "Risk Comparison"])
         st.markdown("---")
@@ -417,13 +465,13 @@ elif menu == "📊 EDA":
 
     with col2:
         if chart_type == "Distribution":
-            st.subheader(f"Distribution — {feature}")
-            fig, ax = plt.subplots(figsize=(7, 4))
+            section_header(f"Distribution — {feature}")
+            fig, ax = plt.subplots(figsize=FIG_WIDE)
             for risk, color, label in zip([0, 1], [BLUE, RED], ["Low Risk", "High Risk"]):
                 sns.histplot(df[df["Heart_Risk"] == risk][feature], bins=25, kde=True,
                              color=color, alpha=0.55, label=label, ax=ax,
                              edgecolor="#ffffff", linewidth=0.6,
-                             line_kws={"linewidth": 3.2})
+                             line_kws={"linewidth": 3.4})
             ax.legend()
             ax.grid(True)
             ax.set_xlabel(feature)
@@ -433,18 +481,19 @@ elif menu == "📊 EDA":
             plt.close()
 
         elif chart_type == "Boxplot":
-            st.subheader(f"Boxplot — {feature} by Risk")
-            fig, ax = plt.subplots(figsize=(7, 4))
+            section_header(f"Boxplot — {feature} by Risk")
+            fig, ax = plt.subplots(figsize=FIG_WIDE)
             group0 = df[df["Heart_Risk"] == 0][feature].dropna().astype(float).values
             group1 = df[df["Heart_Risk"] == 1][feature].dropna().astype(float).values
             bp = ax.boxplot(
                 [group0, group1],
                 tick_labels=["Low Risk", "High Risk"],
                 patch_artist=True,
-                medianprops={"color": "#1e293b", "linewidth": 2},
-                flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 3, "alpha": 0.5},
-                whiskerprops={"color": "#94a3b8"},
-                capprops={"color": "#94a3b8"},
+                medianprops={"color": "#1e293b", "linewidth": 2.4},
+                flierprops={"marker": "o", "markerfacecolor": RED, "markersize": 4, "alpha": 0.6},
+                whiskerprops={"color": "#334155", "linewidth": 1.6},
+                capprops={"color": "#334155", "linewidth": 1.6},
+                boxprops={"linewidth": 2},
             )
             bp["boxes"][0].set_facecolor(BLUE + "55")
             bp["boxes"][0].set_edgecolor(BLUE)
@@ -457,14 +506,14 @@ elif menu == "📊 EDA":
             plt.close()
 
         else:
-            st.subheader(f"Risk Comparison — {feature}")
-            fig, ax = plt.subplots(figsize=(7, 4))
+            section_header(f"Risk Comparison — {feature}")
+            fig, ax = plt.subplots(figsize=FIG_WIDE)
             means = df.groupby("Heart_Risk")[feature].mean()
             bars = ax.bar(["Low Risk", "High Risk"], means.values, color=[BLUE, RED],
-                           width=0.45, edgecolor="#ffffff", linewidth=1.5)
+                           width=0.45, edgecolor="#ffffff", linewidth=1.8)
             for bar, val in zip(bars, means.values):
                 ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01 * means.max(),
-                        f"{val:.2f}", ha="center", color="#1e293b", fontsize=10, fontweight="bold")
+                        f"{val:.2f}", ha="center", color="#1e293b", fontsize=12, fontweight="bold")
             ax.set_ylabel(f"Mean {feature}")
             ax.grid(True, axis="y")
             fig.patch.set_facecolor(DARK_BG)
@@ -473,36 +522,8 @@ elif menu == "📊 EDA":
             plt.close()
 
     st.markdown("---")
-    st.subheader("Full Correlation Matrix")
-
-    corr_eda = df.corr().round(2)
-    fig = go.Figure(data=go.Heatmap(
-        z=corr_eda.values,
-        x=corr_eda.columns,
-        y=corr_eda.columns,
-        colorscale="RdBu_r",
-        zmid=0,
-        text=corr_eda.values,
-        texttemplate="%{text}",
-        textfont={"size": 9, "color": "white"},
-        hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Correlation: %{z}<extra></extra>",
-        colorbar=dict(
-            title=dict(text="Correlation", font=dict(color="#334155")),
-            tickfont=dict(color="#334155"),
-            thickness=15,
-        ),
-    ))
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#334155", family="Inter"),
-        title=dict(text="Feature Correlation Matrix", font=dict(color="#1e293b", size=14)),
-        xaxis=dict(tickangle=-45, tickfont=dict(size=10), showgrid=False),
-        yaxis=dict(tickfont=dict(size=10), showgrid=False, autorange="reversed"),
-        height=600,
-        margin=dict(l=10, r=10, t=50, b=10),
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    section_header("Full Correlation Matrix")
+    st.plotly_chart(render_corr_heatmap(df.corr().round(2), height=650), use_container_width=True)
 
 # =========================
 # MODELS
@@ -522,15 +543,15 @@ elif menu == "🤖 Models":
     col3.metric("⚡ XGBoost", f"{acc_xgb:.2%}")
 
     st.markdown("---")
-    st.subheader("Accuracy Comparison")
-    fig, ax = plt.subplots(figsize=(7, 4))
+    section_header("Accuracy Comparison")
+    fig, ax = plt.subplots(figsize=FIG_WIDE)
     model_names = ["Random Forest", "Logistic\nRegression", "XGBoost"]
     scores = [acc_rf, acc_lr, acc_xgb]
     colors = [RED, BLUE, VIOLET]
-    bars = ax.bar(model_names, scores, color=colors, width=0.45, edgecolor="#ffffff", linewidth=1.5)
+    bars = ax.bar(model_names, scores, color=colors, width=0.45, edgecolor="#ffffff", linewidth=1.8)
     for bar, val in zip(bars, scores):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.004,
-                f"{val:.2%}", ha="center", color="#1e293b", fontsize=11, fontweight="bold")
+                f"{val:.2%}", ha="center", color="#0f172a", fontsize=13, fontweight="bold")
     ax.set_ylim(min(scores) - 0.05, 1.0)
     ax.set_ylabel("Accuracy")
     ax.grid(True, axis="y")
@@ -540,7 +561,7 @@ elif menu == "🤖 Models":
     plt.close()
 
     st.markdown("---")
-    st.subheader("Confusion Matrices")
+    section_header("Confusion Matrices")
     colA, colB, colC = st.columns(3)
     for col, title, y_pred, cmap in [
         (colA, "Random Forest", y_pred_rf, "Reds"),
@@ -548,15 +569,15 @@ elif menu == "🤖 Models":
         (colC, "XGBoost", y_pred_xgb, "Purples"),
     ]:
         with col:
-            st.markdown(f"**{title}**")
+            st.markdown(f"<div style='text-align:center; font-weight:800; color:#0f172a; margin-bottom:6px;'>{title}</div>", unsafe_allow_html=True)
             cm = confusion_matrix(y_test, y_pred)
-            fig, ax = plt.subplots(figsize=(3.8, 3.4))
+            fig, ax = plt.subplots(figsize=FIG_SQUARE)
             sns.heatmap(cm, annot=True, fmt="d", cmap=cmap, ax=ax,
-                        linewidths=1.5, linecolor="#ffffff",
+                        linewidths=2, linecolor="#ffffff",
                         xticklabels=["Low", "High"], yticklabels=["Low", "High"],
-                        annot_kws={"size": 14, "weight": "bold"})
-            ax.set_xlabel("Predicted", fontsize=9)
-            ax.set_ylabel("Actual", fontsize=9)
+                        annot_kws={"size": 16, "weight": "bold"}, cbar=False)
+            ax.set_xlabel("Predicted", fontsize=11, fontweight="bold")
+            ax.set_ylabel("Actual", fontsize=11, fontweight="bold")
             fig.patch.set_facecolor(DARK_BG)
             fig.tight_layout()
             st.pyplot(fig)
@@ -570,16 +591,15 @@ elif menu == "🤖 Models":
     st.success(f"🏆 Best Model: **{best_name}** — {best_acc:.2%} accuracy")
 
     st.markdown("---")
-    st.subheader("PCA Explained Variance")
+    section_header("PCA Explained Variance")
     cumvar = np.cumsum(pca.explained_variance_ratio_)
-    fig, ax = plt.subplots(figsize=(9, 4))
-    ax.plot(range(1, len(cumvar)+1), cumvar, color=RED, linewidth=2.5,
-            marker="o", markersize=6, markerfacecolor="#ffffff", markeredgecolor=RED)
+    fig, ax = plt.subplots(figsize=FIG_WIDE)
+    ax.plot(range(1, len(cumvar)+1), cumvar, color=RED, linewidth=3.4,
+            marker="o", markersize=7, markerfacecolor="#ffffff", markeredgecolor=RED, markeredgewidth=2)
     ax.fill_between(range(1, len(cumvar)+1), cumvar, alpha=0.12, color=RED)
-    ax.axhline(0.93, linestyle="--", color=BLUE, linewidth=1.5, label="93% threshold")
+    ax.axhline(0.93, linestyle="--", color=BLUE, linewidth=2, label="93% threshold")
     ax.set_xlabel("Number of Components")
     ax.set_ylabel("Cumulative Explained Variance")
-    ax.set_title("PCA Explained Variance Curve")
     ax.legend()
     ax.grid(True)
     fig.patch.set_facecolor(DARK_BG)
@@ -620,7 +640,7 @@ elif menu == "🧠 Predict":
                     inputs[col] = st.slider(col.replace("_", " "), 0.0, 1.0, 0.0)
 
     with tab3:
-        st.subheader("🚶 Lifestyle & Demographics")
+        section_header("🚶 Lifestyle & Demographics")
         col1, col2 = st.columns(2)
         lifestyle_cols = ["Sedentary_Lifestyle", "Chronic_Stress"]
         for i, col in enumerate(lifestyle_cols):
@@ -649,7 +669,7 @@ elif menu == "🧠 Predict":
         prob = model_choice.predict_proba(input_pca)[0][1]
 
         st.markdown("---")
-        st.subheader("Prediction Result")
+        section_header("Prediction Result")
 
         col_res, col_gauge = st.columns([1, 1.6])
 
@@ -681,16 +701,16 @@ elif menu == "🧠 Predict":
 
         with col_gauge:
             bar_color = RED if prediction == 1 else BLUE
-            fig, ax = plt.subplots(figsize=(5.5, 3))
-            ax.barh(["Risk Score"], [prob], color=bar_color, height=0.35, zorder=3)
-            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#dbe9fb", height=0.35, zorder=3)
+            fig, ax = plt.subplots(figsize=(6.2, 3.4))
+            ax.barh(["Risk Score"], [prob], color=bar_color, height=0.4, zorder=3)
+            ax.barh(["Risk Score"], [1 - prob], left=[prob], color="#e2e8f0", height=0.4, zorder=3)
             ax.set_xlim(0, 1)
-            ax.set_xlabel("Probability", fontsize=9)
-            ax.axvline(0.5, color="#94a3b8", linewidth=1.2, linestyle="--", zorder=4)
-            ax.text(0.5, -0.62, "Threshold", ha="center", fontsize=8, color="#64748b")
-            ax.text(prob / 2, 0, f"{prob:.0%}", ha="center", va="center",
-                    color="#fff", fontsize=12, fontweight="bold", zorder=5)
-            ax.set_title(f"Model: {model_name} · Risk: {prob:.1%}", fontsize=10)
+            ax.set_xlabel("Probability", fontsize=11, fontweight="bold")
+            ax.axvline(0.5, color="#334155", linewidth=1.8, linestyle="--", zorder=4)
+            ax.text(0.5, -0.62, "Threshold", ha="center", fontsize=10, color="#334155", fontweight="bold")
+            ax.text(prob / 2 if prob > 0.12 else prob + 0.08, 0, f"{prob:.0%}", ha="center", va="center",
+                    color="#fff" if prob > 0.12 else "#0f172a", fontsize=14, fontweight="bold", zorder=5)
+            ax.set_title(f"Model: {model_name} · Risk: {prob:.1%}", fontsize=13, fontweight="bold")
             ax.grid(False)
             fig.patch.set_facecolor(DARK_BG)
             fig.tight_layout()
